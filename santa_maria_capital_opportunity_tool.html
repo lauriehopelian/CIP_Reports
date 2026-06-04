@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City of Santa Maria — Capital Projects Opportunity Inventory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F3EE;--text:#1A1916;--accent:#8B1F2F;--accent-light:#F9EBED;
+    --green:#1A7F4B;--green-light:#E6F4EC;--amber:#B45309;--amber-light:#FEF3C7;
+    --red:#B91C1C;--red-light:#FEE2E2;--blue:#1E4D8C;--blue-light:#EAF0F9;
+    --purple:#6D28D9;--purple-light:#F4F2FB;--border:#E2DED6;--muted:#6B6860;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
+
+  .header{background:var(--text);color:#F5F3EE;padding:36px 40px 28px;position:relative;overflow:hidden;}
+  .header-watermark{position:absolute;right:24px;top:-10px;font-size:200px;font-weight:600;color:rgba(255,255,255,0.04);font-family:'DM Mono',monospace;pointer-events:none;user-select:none;line-height:1;}
+  .header-agency{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,243,238,.5);margin-bottom:6px;}
+  .header-program{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.1;margin-bottom:4px;}
+  .header-sub{font-size:13px;color:rgba(245,243,238,.55);font-weight:300;}
+  .header-stats{display:flex;gap:28px;margin-top:24px;flex-wrap:wrap;}
+  .header-stat{display:flex;flex-direction:column;gap:3px;}
+  .header-stat-val{font-size:22px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:-.03em;}
+  .sv-red{color:#FCA5A5;} .sv-amber{color:#FCD34D;} .sv-green{color:#5EEAD4;} .sv-blue{color:#93C5FD;}
+  .header-stat-label{font-size:11px;color:rgba(245,243,238,.45);text-transform:uppercase;letter-spacing:.08em;}
+
+  .intel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px 40px;}
+  .intel-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px 18px;}
+  .intel-card-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+  .intel-icon{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+  .ii-red{background:var(--red-light);color:var(--red);} .ii-green{background:var(--green-light);color:var(--green);}
+  .ii-amber{background:var(--amber-light);color:var(--amber);} .ii-blue{background:var(--blue-light);color:var(--blue);}
+  .ii-purple{background:var(--purple-light);color:var(--purple);} .ii-gray{background:#F3F4F6;color:#6B7280;}
+  .intel-body{font-size:12.5px;color:#333;line-height:1.6;}
+  .intel-body p{margin-bottom:7px;} .intel-body p:last-child{margin-bottom:0;}
+  .intel-body strong{font-weight:600;color:var(--text);}
+  .intel-body ul{padding-left:14px;margin:4px 0;} .intel-body li{margin-bottom:3px;}
+
+  .quick-filters{padding:0 40px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .quick-label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-right:4px;}
+  .qbtn{border:1px solid var(--border);background:#fff;color:var(--text);padding:5px 12px;border-radius:20px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .12s;}
+  .qbtn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .qbtn.score{background:var(--green-light);color:var(--green);border-color:#bbf7d0;}
+  .qbtn.score:hover{background:var(--green);color:#fff;border-color:var(--green);}
+
+  .controls-bar{position:sticky;top:0;z-index:100;background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px 40px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+  .controls-bar select,.controls-bar input[type=text]{border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg);outline:none;}
+  .controls-bar select:focus,.controls-bar input[type=text]:focus{border-color:var(--accent);}
+  .controls-bar input[type=text]{min-width:180px;} .controls-bar select{min-width:130px;}
+  .controls-spacer{flex:1;}
+  .export-btn{border:1px solid var(--border);background:#fff;color:var(--text);padding:6px 14px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .12s;}
+  .export-btn:hover{background:var(--text);color:#fff;}
+  .result-count{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap;}
+
+  .table-wrap{padding:0 40px 40px;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:12px;}
+  thead th{background:#F9F8F6;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+  thead th:hover{color:var(--accent);}
+  tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer;}
+  tbody tr:last-child{border-bottom:none;}
+  tbody tr:hover{background:#FAFAF8;}
+  td{padding:11px 14px;vertical-align:top;font-size:13px;}
+  td.et{padding:11px 10px;text-align:center;color:var(--muted);font-size:14px;cursor:pointer;user-select:none;}
+  .detail-row td{padding:0;background:var(--purple-light);border-left:3px solid var(--purple);}
+  .detail-panel{display:grid;grid-template-columns:1fr 1fr 220px;gap:0;padding:20px 20px 20px 24px;}
+  .dc{padding-right:24px;border-right:1px solid #DDD8F0;}
+  .dc:last-child{padding-right:0;border-right:none;padding-left:20px;}
+  .dc:nth-child(2){padding-left:24px;}
+  .dc-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--purple);margin-bottom:10px;}
+  .detail-analysis{font-size:12.5px;line-height:1.7;color:#333;}
+  .fi{display:flex;gap:7px;margin-bottom:7px;font-size:12.5px;line-height:1.5;}
+  .fb{font-size:10px;margin-top:3px;flex-shrink:0;}
+  .fb.c{color:var(--green);} .fb.i{color:var(--purple);}
+  .signal-list{list-style:none;}
+  .signal-item{background:#fff;border:1px solid #DDD8F0;border-radius:5px;padding:6px 9px;margin-bottom:6px;font-size:11.5px;color:#444;line-height:1.4;}
+  .src-link{display:block;font-size:11px;color:var(--accent);text-decoration:none;margin-top:8px;font-family:'DM Mono',monospace;word-break:break-all;}
+  .src-link:hover{text-decoration:underline;}
+  .src-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:10px;margin-bottom:4px;}
+
+  .score-dot{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:#fff;flex-shrink:0;}
+  .score-5{background:#1A7F4B;} .score-4{background:#1E4D8C;} .score-3{background:#B45309;} .score-2{background:#6B6860;} .score-1{background:#9CA3AF;}
+
+  .cat-badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:600;letter-spacing:.04em;white-space:nowrap;}
+  .cat-utilities{background:#DBEAFE;color:#1E4D8C;}
+  .cat-streets{background:#D1FAE5;color:#065F46;}
+  .cat-parks{background:#EDE9FE;color:#4C1D95;}
+  .cat-safety{background:#FEE2E2;color:#B91C1C;}
+  .cat-transit{background:#FEF3C7;color:#92400E;}
+  .cat-facilities{background:#F3F4F6;color:#374151;}
+  .cat-waste{background:#FDF2F8;color:#9D174D;}
+
+  .status-pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;letter-spacing:.04em;white-space:nowrap;}
+  .s-active{background:var(--green-light);color:var(--green);}
+  .s-planning{background:var(--blue-light);color:var(--blue);}
+  .s-future{background:#F3F4F6;color:#6B7280;}
+
+  .signals-cell{display:flex;flex-direction:column;gap:3px;}
+  .signal-chip{font-size:11px;color:var(--muted);line-height:1.4;}
+  .signal-chip::before{content:'· ';}
+  .budget-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;}
+  .project-name{font-weight:500;color:var(--text);line-height:1.3;}
+  .cat-tag{display:inline-block;font-size:10px;color:var(--muted);background:#F3F4F6;border-radius:3px;padding:1px 6px;margin-top:3px;}
+  .hot-badge{display:inline-block;background:#FEF3C7;color:#D97706;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:1px 5px;border-radius:3px;margin-left:5px;vertical-align:middle;}
+  .no-results{text-align:center;padding:48px;color:var(--muted);font-size:14px;}
+  .footer{border-top:1px solid var(--border);padding:20px 40px;font-size:11px;color:var(--muted);line-height:1.6;}
+  .footer strong{color:var(--text);font-weight:600;}
+  .alert-banner{background:#FEF3C7;border-left:4px solid #F59E0B;padding:10px 40px;font-size:12.5px;color:#78350F;}
+  .alert-banner strong{font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-watermark">SM</div>
+  <div class="header-agency">City of Santa Maria, California</div>
+  <div class="header-program">Capital Projects Opportunity Inventory<br>FY 2024-26 Biennial Budget</div>
+  <div class="header-sub">$115.9M in 64 capital projects · $62.2M in FY 2024-25 · $53.6M in FY 2025-26 · Source: 2024-26 Adopted Biennial Budget (adopted June 18, 2024)</div>
+  <div class="header-stats">
+    <div class="header-stat"><div class="header-stat-val sv-amber">$115.9M</div><div class="header-stat-label">Total Capital Budget</div></div>
+    <div class="header-stat"><div class="header-stat-val sv-red">$21.3M</div><div class="header-stat-label">General Fund Deficit (FY24-25)</div></div>
+    <div class="header-stat"><div class="header-stat-val sv-blue">93.4%</div><div class="header-stat-label">Non-GF Funded</div></div>
+    <div class="header-stat"><div class="header-stat-val sv-green">$300M+</div><div class="header-stat-label">WWTP Compliance (Long-Term)</div></div>
+    <div class="header-stat"><div class="header-stat-val sv-green" id="score45count">—</div><div class="header-stat-label">Score 4–5 Projects</div></div>
+  </div>
+</div>
+
+<div class="alert-banner">
+  <strong>⚠ Fiscal Context:</strong> The City is in its 15th consecutive year of structural General Fund deficit. The 2024-26 budget depletes three reserve funds (General Fund, Measure U, LEAF). 93.4% of capital spending comes from Enterprise Funds (Water, Wastewater, Solid Waste, Transit), Growth Mitigation fees, Gas Tax, and Measure A — not the General Fund. General Fund capital is tightly constrained at $3.5M (FY24-25) and $2.8M (FY25-26). Score accordingly: the largest opportunities are in Utilities, not General Fund.
+</div>
+
+<div class="intel-grid">
+
+  <div class="intel-card">
+    <div class="intel-card-title"><span class="intel-icon ii-blue">📖</span>How to Read the Scoring</div>
+    <div class="intel-body">
+      <p><strong>Score 5 — Act Now:</strong> Funded, design complete or active, bid date known or construction underway.</p>
+      <p><strong>Score 4 — Get Positioned:</strong> Funded, budget approved, design beginning or near-term trigger confirmed.</p>
+      <p><strong>Score 3 — Watch Actively:</strong> Budgeted in 2025-26 or multi-year program with confirmed funding trajectory.</p>
+      <p><strong>Score 2 — Monitor:</strong> Future-year project (2026-28 CIP) with no active design or dependent on future bond/grant.</p>
+      <p><strong>Score 1 — Closeout/Equipment:</strong> Fleet or equipment replacement; no design services needed.</p>
+      <p style="margin-top:8px;font-size:11.5px;color:var(--muted)">Key: <strong>Utilities Enterprise Fund</strong> projects are the richest opportunity. Water/Wastewater capital is $36M (FY24-25) alone. Solid Waste Disposal's Los Flores IWMF is a multi-decade, $100M+ construction program. General Fund projects are small and tightly constrained.</p>
+    </div>
+  </div>
+
+  <div class="intel-card">
+    <div class="intel-card-title"><span class="intel-icon ii-green">🎯</span>Projects with Clearest Near-Term Paths</div>
+    <div class="intel-body">
+      <p><strong>WWTP Upgrade (Wastewater)</strong> — Regulatory mandate (Regional Water Quality Control Board General Permit, enrolled Feb 2022). Total estimated cost exceeds $300M. Master Plan underway. Bond issuance forecast for FY 2027-28. Environmental/civil engineers and WWTP process specialists should be engaged now on master plan and feasibility work.</p>
+      <p><strong>Sports Complex at Depot & Battles</strong> — 19 acres purchased. Budget narrative says "construction is to begin this year" (2024-25). Measure U capital ($1.2M) committed. Site development, civil, and sports facility contractors should be on-radar for RFPs.</p>
+      <p><strong>Water Distribution CIP</strong> — $32.2M budgeted in FY24-25 (Water Fund). Named projects: Stowell/Black Waterline, McClelland Waterline, Reservoir 4 Roof, Well #6 Intertie, Well #15, Well Site Generator Enclosures, Corporation Yard. Active procurement across multiple packages.</p>
+      <p><strong>Los Flores IWMF (Landfill)</strong> — $16.7M budgeted in FY24-25 Solid Waste Disposal Fund. Environmental permitting, civil, liner construction. Bond issuance FY 2026-27. Multi-phase program through 2032.</p>
+      <p><strong>Fire Training Facility</strong> — Budgeted FY 2025-26 in four-year CIP. Architects and fire facility specialists should be positioning now.</p>
+    </div>
+  </div>
+
+  <div class="intel-card">
+    <div class="intel-card-title"><span class="intel-icon ii-amber">⚠️</span>Structural Constraints to Watch</div>
+    <div class="intel-body">
+      <p><strong>General Fund is depleted.</strong> The City draws $21.3M from reserves in FY24-25. Only $3.5M in GF capital FY24-25 ($2.8M in FY25-26). Eight requested GF capital projects were unfunded ($2.5M). Do not expect GF-funded construction beyond what's in this budget.</p>
+      <p><strong>Capital is nearly entirely Enterprise-funded.</strong> 93.4% of capital comes from Water, Wastewater, Solid Waste, Transit, Gas Tax, and Growth Mitigation. These funds are healthy and actively spending — they are where the capital market is.</p>
+      <p><strong>ARPA deadline was December 31, 2024.</strong> All ARPA funds had to be spent or encumbered by that date. Any ARPA-funded capital projects were either completed or encumbered before this budget was built.</p>
+      <p><strong>Future-year CIP projects (2026-28) are unfunded in this budget.</strong> Enhanced Roadway Maintenance, Depot/Railroad Bikeway, College Drive Bikeway, East Main Rehab, BRT, Fire Station 2 relocation, Pocket Parks, and ADA at Simas Field are all in the 4-year plan but not appropriated until 2026+.</p>
+      <p><strong>WWTP costs may exceed $300M.</strong> Full scope unknown until Master Plan complete. This is the City's largest single capital exposure and will require rate increases and bonding — a generational infrastructure program.</p>
+    </div>
+  </div>
+
+  <div class="intel-card">
+    <div class="intel-card-title"><span class="intel-icon ii-purple">🏢</span>Best Targets by Firm Type</div>
+    <div class="intel-body">
+      <p><strong>Civil / Environmental Engineers:</strong> WWTP Master Plan (lead target — get on shortlist now), Los Flores IWMF permitting and design, Water CIP (Stowell/Black, McClelland waterlines), Sewer capacity upgrades (A-1, B-1, C-1, C-7, D-1 to D-17 pipeline IDs from Capacity Study), Corporation Yard Consolidation.</p>
+      <p><strong>Architects / Design Firms:</strong> Fire Training Facility (FY25-26), Fire Station 2 relocation (FY26-27), Transit Administration Building (FY25-27), Sports Complex at Depot/Battles (construction beginning 2024-25), Pocket Parks (FY26-28).</p>
+      <p><strong>General Contractors:</strong> Sports Complex construction (active FY24-25), Corporation Yard Consolidation (Water/Wastewater), Los Flores IWMF liner/earthwork, Fire Training Facility (FY25-26).</p>
+      <p><strong>Specialty / MEP:</strong> Well Site Generator Enclosures, Reservoir 4 Roof Replacement, WWTP process modifications, Landfill Flare Replacement, Landfill Site Security System, EV Infrastructure (transit fleet electrification).</p>
+      <p><strong>Transit / Transportation:</strong> Bus replacement (all-electric fleet initiative), BRT Implementation (2026-28), Bikeway Projects (Depot/Railroad 2026-28, College Drive 2027-28), Remote Transit Facility (FY25-26).</p>
+    </div>
+  </div>
+
+  <div class="intel-card">
+    <div class="intel-card-title"><span class="intel-icon ii-red">🚩</span>Red Flags / False Positives</div>
+    <div class="intel-body">
+      <p><strong>Mobile Equipment Replacement ($18.5M over 2 years)</strong> — 46 pieces of fleet equipment (refuse trucks, vehicles, etc.). This is equipment procurement, not design or construction. Fleet vendors and dealers — not engineering or construction firms — are the targets here.</p>
+      <p><strong>Growth Mitigation Fund ($8.2M FY24-25)</strong> — This is a pool for multiple uses (traffic, rec/parks, public safety, water/wastewater impact fees). Not a single project. Funds are allocated to specific projects as triggered by development — not a standalone bid opportunity.</p>
+      <p><strong>Gas Tax & TDA ($5.4M FY24-25)</strong> — Annual preventive street maintenance. Largely allocated to recurring road overlay and maintenance contracts. Limited new design opportunity; focused on contractors already on rotating maintenance contracts.</p>
+      <p><strong>Wastewater CIP ($4.25M FY24-25)</strong> — The large $14.7M FY23-24 wastewater capital budget dropped dramatically in FY24-25. This reflects timing — the WWTP Master Plan is underway but major construction won't begin until 2027-28 per the rate model.</p>
+      <p><strong>Park Acquisition Fund ($150K FY24-25)</strong> — Minimal appropriation, land acquisition purpose, not a construction bid opportunity.</p>
+    </div>
+  </div>
+
+  <div class="intel-card">
+    <div class="intel-card-title"><span class="intel-icon ii-gray">👁</span>Watchlist Triggers</div>
+    <div class="intel-body">
+      <p><strong>WWTP Master Plan completion and RFP.</strong> The City is "working with a technical firm" on the Master Plan — watch for the Master Plan adoption at City Council, which will trigger a design RFQ for the actual WWTP upgrade (potential $300M+ construction program). This is the most consequential future procurement in the City.</p>
+      <p><strong>Sports Complex bid advertisement.</strong> "Construction is to begin this year" (FY24-25) per budget narrative. A GC RFP or pre-qualification should have been issued or be imminent. Check the City's procurement portal and City Council agenda for contract awards.</p>
+      <p><strong>Fire Training Facility design award (FY25-26).</strong> Watch City Council agendas for a Fire Training Facility design contract — this is the leading indicator before the construction bid.</p>
+      <p><strong>Los Flores IWMF environmental permitting milestones.</strong> The landfill needs environmental review and permits before liner construction. Watch CalRecycle and RWQCB permit filings for the Los Flores site.</p>
+      <p><strong>General Plan update adoption.</strong> The General Plan update is near completion. Adoption will trigger a wave of infrastructure master plan updates (Water, Wastewater, Streets, Parks) and associated consultant/engineer procurements.</p>
+      <p><strong>Mid-Cycle Budget Review (June 2025).</strong> The City manager will bring amendments to the second-year budget. Watch for any new capital projects added or carryover adjustments — this may unlock previously unfunded projects.</p>
+      <p><strong>2025-26 rate increases (Water/Wastewater).</strong> Rate increases approved Oct 2023 phase in Jan 2024 through 2026. Increased Enterprise Fund revenues will support expanded capital spending in FY25-26 — watch the Water Fund ($35.2M capital in FY25-26) carefully.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="quick-filters">
+  <span class="quick-label">Filter:</span>
+  <button class="qbtn score" onclick="qf('score','4')">⭐ Score 4+</button>
+  <button class="qbtn" onclick="qf('cat','Utilities/Water')">Water/Wastewater</button>
+  <button class="qbtn" onclick="qf('cat','Solid Waste')">Solid Waste</button>
+  <button class="qbtn" onclick="qf('cat','Streets/Transportation')">Streets & Transit</button>
+  <button class="qbtn" onclick="qf('cat','Parks/Recreation')">Parks & Sports</button>
+  <button class="qbtn" onclick="qf('cat','Public Safety')">Fire & Police</button>
+  <button class="qbtn" onclick="qf('cat','Facilities/Gov')">Facilities</button>
+  <button class="qbtn" onclick="qf('status','Active Construction')">Active Now</button>
+  <button class="qbtn" onclick="qf('fy','2024-25')">FY 2024-25</button>
+  <button class="qbtn" onclick="qf('fy','2025-26')">FY 2025-26</button>
+  <button class="qbtn" onclick="resetFilters()">✕ Clear</button>
+</div>
+
+<div class="controls-bar">
+  <select id="fCat" onchange="applyFilters()">
+    <option value="">All Categories</option>
+    <option>Utilities/Water</option>
+    <option>Solid Waste</option>
+    <option>Streets/Transportation</option>
+    <option>Parks/Recreation</option>
+    <option>Public Safety</option>
+    <option>Facilities/Gov</option>
+    <option>Fleet/Equipment</option>
+  </select>
+  <select id="fStatus" onchange="applyFilters()">
+    <option value="">All Statuses</option>
+    <option>Active Construction</option>
+    <option>Board Approved / Planning</option>
+    <option>Future CIP (2026+)</option>
+  </select>
+  <select id="fFy" onchange="applyFilters()">
+    <option value="">All Years</option>
+    <option value="2024-25">FY 2024-25</option>
+    <option value="2025-26">FY 2025-26</option>
+    <option value="2026+">FY 2026+</option>
+  </select>
+  <select id="fScore" onchange="applyFilters()">
+    <option value="">All Scores</option>
+    <option value="5">Score 5</option>
+    <option value="4">Score 4</option>
+    <option value="3">Score 3</option>
+    <option value="2">Score 2</option>
+    <option value="1">Score 1</option>
+  </select>
+  <input type="text" id="fSearch" placeholder="Search projects…" oninput="applyFilters()">
+  <div class="controls-spacer"></div>
+  <span class="result-count" id="rCount">— projects</span>
+  <button class="export-btn" onclick="exportCSV()">⬇ CSV</button>
+  <button class="export-btn" onclick="exportJSON()">⬇ JSON</button>
+  <button class="export-btn" onclick="printSummary()">🖨 Print</button>
+</div>
+
+<div class="table-wrap">
+  <table><thead><tr>
+    <th></th>
+    <th onclick="sb('name')">Project</th>
+    <th onclick="sb('cat')">Category</th>
+    <th onclick="sb('status')">Status</th>
+    <th onclick="sb('fy')">FY</th>
+    <th onclick="sb('budget')">Budget</th>
+    <th onclick="sb('fund')">Fund Source</th>
+    <th onclick="sb('score')">Score</th>
+    <th>Top Signals</th>
+    <th></th>
+  </tr></thead>
+  <tbody id="tBody"></tbody></table>
+</div>
+
+<div class="footer">
+  <strong>Source:</strong> City of Santa Maria, 2024-26 Adopted Biennial Budget (adopted June 18, 2024). Capital project amounts derived from budget narrative, fund summaries, and Capital Projects List (pp. 147–170). Individual project line-item detail from pages 151–170 was not fully extractable from the published PDF; budgets for named projects were calculated from fund-level capital appropriations and narrative descriptions. No City Council meeting minutes or procurement records were reviewed — scores applied conservatively per single-source guidance. For City procurement notices: <a href="https://www.cityofsantamaria.org" target="_blank" style="color:var(--accent)">cityofsantamaria.org</a>.
+</div>
+
+<script>
+const CAT_CLASSES = {
+  'Utilities/Water':'cat-utilities','Solid Waste':'cat-waste',
+  'Streets/Transportation':'cat-streets','Parks/Recreation':'cat-parks',
+  'Public Safety':'cat-safety','Facilities/Gov':'cat-facilities','Fleet/Equipment':'cat-transit'
+};
+
+const P = [
+  {id:1,name:"Wastewater Treatment Plant Upgrade — Master Plan & Compliance Program",cat:"Utilities/Water",status:"Board Approved / Planning",fy:"2024-25",budget:300,fund:"Wastewater Enterprise Fund",score:5,hot:true,
+  signals:["Regulatory mandate: RWQCB General Permit enrolled Feb 2022 — non-negotiable compliance driver","Current WWTP cannot meet General Permit requirements — non-compliance risk is existential","Total estimated cost exceeds $300M — largest single capital program in City history","Master Plan underway with technical firm; bond issuance forecast FY 2027-28","Rate model includes phased rate increases to fund program — financing pathway established"],
+  facts:["City's WWTP enrolled under Regional Water Quality Control Board General Permit in February 2022","Current WWTP cannot meet all General Permit requirements — compliance timeline is active","'While it is not possible to accurately estimate the costs to achieve compliance, a program of this magnitude may have costs exceeding $300,000,000'","Wastewater Master Plan underway — will evaluate treatment alternatives and feasibility","Rate model forecasts bond issuance for WWTP upgrades beginning FY 2027-28","Four wastewater rate increases approved by City Council October 17, 2023 (first implemented Jan 1, 2024)"],
+  inferences:["Master Plan RFQ/RFP is the immediate procurement opportunity — if not yet awarded, firms should contact Utilities Department Director Shad Springer","Environmental engineers, process engineers, and WWTP specialists should be on the City's shortlist now — master planning work leads to design and construction in a direct pipeline","At $300M+, this is the defining capital program for Santa Maria's next decade — the GC opportunity alone could be $150M+ in construction value","Pipeline capacity projects (A-1, B-1, C-1, C-7, D-1 through D-17) are separately identified in the Capacity Study and will generate multiple discrete bid packages","Sewer trunk line capacity upgrades are budgeted in FY24-25 — these are currently in procurement"],
+  notes:"The Santa Maria Wastewater Treatment Plant compliance program is the most consequential capital opportunity in the City's portfolio, driven by a non-negotiable regulatory mandate. In February 2022, the City's WWTP enrolled under the Regional Water Quality Control Board's General Permit, a permit the current plant cannot meet. The budget explicitly estimates costs 'exceeding $300,000,000' — making this a generational infrastructure program. A technical firm is currently engaged on the Wastewater Master Plan, which will evaluate treatment alternatives and produce the design basis for the WWTP upgrade. The rate model forecasts bond issuance beginning FY 2027-28, with four phased rate increases already adopted through 2026. The near-term opportunity is the Master Plan process itself; the design and construction procurements will flow directly from that. Separately, the Utilities Capacity Study has identified sewer pipeline capacity projects (referenced by ID numbers A-1, B-1, C-1, C-7, D-1, D-2, D-4, D-8, D-12, D-14, D-17) that will generate discrete bid packages independent of the WWTP upgrade.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:2,name:"Water Distribution CIP — FY 2024-25 Package",cat:"Utilities/Water",status:"Active Construction",fy:"2024-25",budget:32.18,fund:"Water Enterprise Fund",score:5,hot:true,
+  signals:["$32.18M in Water Fund capital appropriated for FY24-25 — largest single-year capital fund in budget","Named projects: Stowell/Black Waterline, McClelland Waterline, Reservoir 4 Roof, Well #6 Intertie, Well #15, Well Site Generator Enclosures, Corporation Yard Consolidation","Multiple simultaneous bid packages likely active across several named projects","Four approved water rate increases phasing in 2024-2026 confirm sustained funding","Water Fund has 'strong reserve balance' per budget narrative — pay-as-you-go capital viable"],
+  facts:["Water Fund Capital & Outside Agencies: $35,421,500 adopted FY23-24; $32,177,060 adopted FY24-25; $35,228,160 adopted FY25-26","Named capital projects from budget: Stowell/Black Waterline, McClelland Waterline, Reservoir 4 Roof Replacement, Well #6 Intertie, Well #15, Well Site Generator Enclosures, Corporation Yard Consolidation, Well Controls","Water rates approved October 17, 2023; first of four increases implemented January 1, 2024","'Water Enterprise Fund has a strong reserve balance, which will be used for pay-as-you-go financing of critical capital infrastructure projects'","Future projects include Groundwater Wells #16 & #17"],
+  inferences:["This is an active, multi-package construction program — civil engineers, pipeline contractors, pump station specialists, and structural engineers should confirm their status on City's on-call lists","Corporation Yard Consolidation spans both Water and Wastewater funds — likely a major facilities project for both departments","Well #15 and #16/#17 projects require drilling contractors with municipal well experience","Well Site Generator Enclosures are mechanical/electrical scope — specialty contractors should be tracking these","Reservoir 4 Roof Replacement is structural/specialty scope","FY25-26 budget ($35.2M) is higher than FY24-25 — capital program is sustained and growing"],
+  notes:"The Water Distribution Capital Improvement Program is an active, multi-project construction program with $32.18M appropriated in FY24-25 and $35.2M in FY25-26. Named projects span civil infrastructure (waterline replacements at Stowell/Black and McClelland), site work (Corporation Yard Consolidation), mechanical (Well Controls, Generator Enclosures), structural (Reservoir 4 Roof), and well drilling (Well #15, future Wells #16 & #17). The Water Fund carries a strong reserve balance and has four approved rate increases phasing in through 2026. This is the most immediately active construction market in Santa Maria's capital portfolio, with multiple bid packages likely running concurrently. Firms should confirm they are on the City's utility contractor lists and contact Utilities Director Shad Springer.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:3,name:"Los Flores Integrated Waste Management Facility (IWMF) — New Landfill",cat:"Solid Waste",status:"Board Approved / Planning",fy:"2024-25",budget:16.74,fund:"Solid Waste Disposal Enterprise Fund",score:4,hot:true,
+  signals:["$16,744,680 budgeted in FY24-25 Solid Waste Disposal Fund — up from $675K in FY23-24","IWMF at Los Flores Ranch — Class III landfill to replace current Santa Maria Regional Landfill (10-year remaining capacity)","Environmental permitting, civil construction, liner systems, and support facilities required","Bond issuance forecast FY 2026-27 — financing pathway confirmed in rate model","Anticipated to accept solid waste by 2032 — multi-phase construction program through 2032"],
+  facts:["Santa Maria Regional Landfill (SMRL) has approximately 10 years of remaining capacity as of December 31, 2023","City intends to construct Integrated Waste Management Facility (IWMF) at Los Flores Ranch — Class III landfill","IWMF will serve urban and rural northern Santa Barbara County; capacity for southern SBC as needed","Rate model forecasts bond issuance beginning FY 2026-27","Solid Waste Disposal Fund Capital: $675,000 (FY23-24) → $16,744,680 (FY24-25) → $0 (FY25-26) — large one-time appropriation","IWMF anticipated to accept solid waste by 2032","Also: Cell I Phase II Liner Extension, Scale House Software, Site Security System, Flare Replacement at existing SMRL in current/prior budgets"],
+  inferences:["$16.7M in FY24-25 suggests environmental permitting, site planning, and early civil construction is actively budgeted","The $0 in FY25-26 suggests this is a pre-construction/permitting phase with the major construction bond to follow 2026-27+","Environmental engineers familiar with CalRecycle permitting, RWQCB coordination, and Class III landfill regulations are immediate targets","Liner installation contractors, civil earthwork contractors, and environmental compliance consultants are core to this scope","The existing SMRL also generates ongoing work (liner extensions, flare systems, site security, scale house technology)","This is a 10+ year program — relationship building now pays dividends through 2032"],
+  notes:"The Los Flores IWMF is Santa Maria's long-range solid waste disposal solution, required because the current Santa Maria Regional Landfill has approximately 10 years of remaining capacity. The FY24-25 Solid Waste Disposal Fund shows $16.74M in capital — a dramatic jump from $675K in the prior year — reflecting active pre-construction and environmental permitting work. The bond financing for major construction is forecast for FY 2026-27, meaning the 2024-25 budget is funding design, permitting, and early site development. The facility must be ready by 2032. Environmental engineers with CalRecycle permitting experience, civil/earthwork contractors familiar with Class III landfill construction, liner specialists, and solid waste consultants should be engaging with the City's Utilities Department now.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:4,name:"Sports Complex at Depot Street & Battles Road",cat:"Parks/Recreation",status:"Active Construction",fy:"2024-25",budget:9.0,fund:"Growth Mitigation / Measure U / Multiple",score:5,hot:true,
+  signals:["Budget narrative: 'construction is to begin this year' (FY 2024-25) — explicit construction start confirmed","City purchased 19 acres at corner of Depot Street and Battles Road — site secured","Measure U capital ($1.2M quality-of-life category) committed in FY24-25","Growth Mitigation Fund ($8.167M in FY24-25) is primary capital source — impact fees funding growth-driven infrastructure","Described as 'long-awaited sports complex' — high political priority"],
+  facts:["City Council and budget narrative: 'purchasing a 19-acre property for the long-awaited sports complex at the corner of Depot Street and Battles Road (construction is to begin this year)'","Measure U capital allocation FY24-25: $1,200,000 for City Manager Capital (quality of life)","Growth Mitigation Fund appropriations: $8,167,000 FY24-25 (primary capital funding pool)","Residential Development Tax Fund: $500,000 FY24-25 (parks-related capital)","City Manager Capital ($1.2M Measure U) is explicitly the only Measure U capital item — focused on this priority"],
+  inferences:["GC/CM RFQ or design-build RFP should be imminent or may already be issued — check City procurement portal immediately","At 19 acres, this is a significant site development project: civil grading, utilities, drainage, sports field installation, lighting, restrooms, parking","Sports field specialty contractors (synthetic turf, field lighting, bleachers, concessions) are secondary subcontract targets","Parks design firms (landscape architects, civil engineers with parks experience) should have been selected in the design phase — confirm who has the design contract","High political priority (mentioned in Budget Message highlights) means construction timeline will be driven hard"],
+  notes:"The Depot/Battles Sports Complex is explicitly described in the budget as beginning construction in FY 2024-25. The City purchased 19 acres for this long-awaited facility, and Measure U's quality-of-life capital allocation for FY24-25 is entirely dedicated to this project ($1.2M). The Growth Mitigation Fund ($8.167M in FY24-25) is the primary capital source for parks and sports facilities. This is a high-priority, politically prominent project — expect aggressive timeline management. Civil contractors, sports field specialists, lighting contractors, and MEP firms should check the City's procurement portal (cityofsantamaria.org) for any active RFPs, pre-qualification notices, or design contract awards.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:5,name:"Transit Fleet Electrification — Bus Replacement Program",cat:"Streets/Transportation",status:"Active Construction",fy:"2024-25",budget:9.8,fund:"Public Transit Fund (Federal Capital Grants)",score:4,hot:false,
+  signals:["Federal Grant – Capital: $9,803,637 in FY24-25 (up from $7.05M in FY23-24)","Budget: 'The division proposes to complete its initiative to replace numerous buses with an all-electric fleet'","Electric bus procurement is well underway — completing the fleet transition in this budget","State Gas Tax transit funding: $7.4M FY24-25, $7.4M FY25-26 — sustained ongoing support","Transit Fund FY25-26: $16.2M total appropriations with $6.08M in capital grants"],
+  facts:["Public Transit Fund Capital: $5,120,000 FY24-25; $6,080,000 FY25-26","Federal Grant Capital: $9,803,637 FY24-25 (previously $7,051,609 FY23-24)","Budget narrative: Santa Maria Regional Transit 'proposes to complete its initiative to replace numerous buses with an all-electric fleet'","State Gas Tax transit funding: $7,415,648 FY24-25; $7,416,376 FY25-26"],
+  inferences:["All-electric bus procurement is the primary capital spend — electric bus dealers/manufacturers (New Flyer, BYD, Proterra, etc.) are the direct procurement target","Charging infrastructure for the depot is a secondary opportunity — electrical contractors with EV charging expertise","Bus procurement for public transit is typically through Federal Transit Administration procurement processes (Cooperative purchasing, state contracts, or independent bids subject to FTA requirements)","FY25-26 has $6.08M more in capital grants — fleet replacement program continues","Remote Transit Facility (FY25-26 in 4-year CIP) will require a separate facility design and construction procurement"],
+  notes:"Santa Maria Regional Transit is completing a major fleet electrification initiative with $9.8M in federal capital grants in FY24-25. The budget narrative explicitly states the transit division will 'complete its initiative to replace numerous buses with an all-electric fleet' in this budget cycle. Electric bus manufacturers and dealers are the primary procurement target. Secondary opportunity: EV charging infrastructure at the transit yard. A Remote Transit Facility is also planned for FY 2025-26 as a separate capital project — this would generate a facilities design and construction procurement.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:6,name:"Fire Department Training Facility",cat:"Public Safety",status:"Board Approved / Planning",fy:"2025-26",budget:3.0,fund:"General Fund / Measure U (estimated)",score:4,hot:false,
+  signals:["Listed in four-year CIP as a FY 2025-26 project — budget appropriation next fiscal year","High institutional priority — listed in the Budget Message as one of the most significant 4-year CIP projects","No existing training facility currently funded — this is a new facility build","Fire Department is 46.5% Measure U funded — Measure U capital could contribute","Architecture/engineering procurement likely begins in FY24-25 or early FY25-26"],
+  facts:["Listed in Budget Message 4-year CIP: 'Fire Department Training Facility (2025-26)'","No standalone capital appropriation yet in FY24-25 — design phase procurement anticipated in FY24-25","Fire Department total budget FY24-25: $25.7M (General Fund + Measure U combined)","City is also planning Fire Station 2 relocation/construction in FY 2026-27"],
+  inferences:["Architect selection for the Training Facility design is likely occurring in FY24-25 — watch City Council agenda for design contract award","A fire training facility typically includes a burn building, drill tower, props, apparatus bay, classroom, and administrative spaces — specialized facility type","Architects with public safety and fire training facility experience should be reaching out to Fire Chief Bradley Dandridge and City Manager's Office","The concurrent planning of Fire Station 2 relocation (2026-27) creates a two-project public safety facilities program — firms positioning on one should pitch both","Budget not confirmed — estimated at $3M based on typical facility scale; actual appropriation will appear in FY25-26 budget"],
+  notes:"The Fire Department Training Facility is one of the explicitly named significant projects in Santa Maria's four-year Capital Improvement Program, scheduled for FY 2025-26. No design contract or capital appropriation has been identified yet in the FY24-25 budget, suggesting this is in the pre-design or architect selection phase. Fire training facilities are highly specialized — burn buildings, drill towers, and specialized firefighter training props require architects and contractors with specific public safety facility experience. Given the FY25-26 appropriation target, design procurement is likely in progress or imminent. Firms should reach out to Fire Chief Bradley Dandridge and watch City Council meeting agendas. The Fire Station 2 relocation (FY 2026-27) is a parallel public safety facilities opportunity.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:7,name:"Corporation Yard Consolidation (Water & Wastewater)",cat:"Utilities/Water",status:"Board Approved / Planning",fy:"2024-25",budget:4.0,fund:"Water / Wastewater Enterprise Funds",score:4,hot:false,
+  signals:["Named explicitly in both Water and Wastewater Fund capital narratives as an active project","Facilities consolidation for Utilities Department operations — new or renovated operations center","Funded from both Water and Wastewater Enterprise Funds (exact split not specified)","Active in FY24-25 — appears in the current capital program alongside named waterline projects","Utilities Department is growing (130.80 FTEs in FY24-25, up from 122.60)"],
+  facts:["Corporation Yard Consolidation listed as a named capital project in both Water Fund and Wastewater Fund expense narratives","Also listed among WWTP-related capital expenses: 'Corporation Yard Consolidation' under wastewater capital projects","Utilities Department FTEs: 122.60 (FY23-24) → 130.80 (FY24-25) — 8 new positions supporting need for expanded facilities","Budget not separately broken out — estimated from fund capital totals"],
+  inferences:["A utilities corporation yard consolidation is typically a $3M–$8M+ facilities project covering operations buildings, vehicle storage, laydown yards, fueling, and staff facilities","Architects with municipal operations/maintenance facility experience should be contacting Utilities Director","MEP engineers, civil site contractors are secondary targets","Project likely in design or early construction given it appears in the FY24-25 capital program","Consolidating Water and Wastewater operations at one site is a significant real estate and construction undertaking"],
+  notes:"The Corporation Yard Consolidation appears as a named capital project in both the Water Fund and Wastewater Fund capital narratives, indicating a shared facilities project combining operations for both utilities. With the Utilities Department growing to 130.80 FTEs, expanded operational facilities are clearly needed. The exact budget has not been broken out separately from fund totals, but a corporation yard consolidation of this type typically runs $3M–$8M+ depending on scope. Architects with municipal operations facility experience and civil/site contractors should contact Utilities Director Shad Springer.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:8,name:"Wastewater Sewer Capacity Upgrades — Trunk Line Package",cat:"Utilities/Water",status:"Board Approved / Planning",fy:"2024-25",budget:4.25,fund:"Wastewater Enterprise Fund",score:4,hot:false,
+  signals:["$4,248,140 in Wastewater capital for FY24-25","Named project types: sewer trunk line capacity upgrades, trash capture devices, site security","Sewer capacity projects from Utilities Capacity Study identified as A-1, B-1, C-1, C-7, D-1, D-2, D-4, D-8, D-12, D-14, D-17","FY25-26 wastewater capital jumps to $14,028,480 — a more than 3x increase year-over-year","Design and permitting work likely active in FY24-25 for the larger FY25-26 construction packages"],
+  facts:["Wastewater Fund Capital: $4,248,140 (FY24-25); $14,028,480 (FY25-26)","Named projects: WWTP upgrade requirements, sewer trunk line capacity upgrades, trash capture devices, site security, Corporation Yard Consolidation","'Anticipated future capital projects include sewer pipeline capacity projects identified in the Utilities Capacity Study as A-1, B-1, C-1, C-7, D-1, D-2, D-4, D-8, D-12, D-14, and D-17'","Wastewater rates approved October 17, 2023 with four phased increases through 2026"],
+  inferences:["The Capacity Study pipeline IDs suggest a detailed pre-design or feasibility study is complete — these projects have identified scope","The large jump to $14M in FY25-26 wastewater capital indicates active design in FY24-25 for construction in FY25-26","Civil/pipeline contractors should be tracking for IFB or JATC bid packages for each of the identified sewer segments","Trash capture devices (stormwater compliance) are specialty products — environmental compliance equipment vendors should be aware","Site security improvements are a smaller IT/security scope within the wastewater fund"],
+  notes:"The Wastewater Fund's capital program grows from $4.25M in FY24-25 to $14M in FY25-26 — a significant ramp-up that signals active design procurement occurring now for FY25-26 construction. The Utilities Capacity Study has already identified specific pipeline segments (A-1 through D-17) that form a discreet set of sewer trunk line capacity projects. These will generate individual bid packages. Civil pipeline contractors, environmental engineering firms, and utility construction specialists should be in contact with the Utilities Department to understand the procurement schedule for each segment. Trash capture devices (SB 1383 compliance) and site security upgrades at the treatment plant are additional smaller-scope opportunities within this fund.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:9,name:"Water Distribution CIP — FY 2025-26 Package",cat:"Utilities/Water",status:"Board Approved / Planning",fy:"2025-26",budget:35.23,fund:"Water Enterprise Fund",score:4,hot:false,
+  signals:["$35.23M in FY25-26 Water Fund capital — larger than FY24-25 program","Groundwater Wells #16 & #17 are the named future projects for FY25-26+","General Plan update will inform additional infrastructure needs","Court-ordered agreement with Nipomo Community Services District increases water delivery requirements to 2,500 acre-feet/year in FY25-26 — revenue-positive for Water Fund","Four approved rate increases phase in through 2026 — fund sustainability confirmed"],
+  facts:["Water Fund Capital FY25-26: $35,228,160","Named future projects: Groundwater Wells #16 & #17, and other projects from General Plan update","NCSD agreement: minimum supplemental water delivery increases from 1,000 to 2,500 acre-feet/year in FY25-26 — increased revenue","Four phased water rate increases approved October 17, 2023"],
+  inferences:["Water well drilling contractors should be positioning for Wells #16 & #17 procurement in FY25-26","The sustained high capital level ($35M+) indicates a mature capital program with multiple concurrent projects","Firms already working on FY24-25 water projects are well-positioned for FY25-26 — continuity of relationships matters","General Plan update adoption will add new infrastructure projects to the Water CIP"],
+  notes:"The Water Distribution CIP continues at $35.2M in FY25-26, slightly above the $32.2M FY24-25 program. Groundwater Wells #16 & #17 are specifically named as FY25-26 priorities. The sustained high capital level reflects the Water Fund's strong reserve balance and approved rate increases. The General Plan update, when adopted, will further inform future capital needs. Water infrastructure contractors already engaged on FY24-25 projects should expect continued work into FY25-26.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:10,name:"Solid Waste Collection Fleet — Vehicle Replacement",cat:"Fleet/Equipment",status:"Active Construction",fy:"2024-25",budget:1.26,fund:"Solid Waste Collection Enterprise Fund",score:1,hot:false,
+  signals:["$1,258,400 in FY24-25 Solid Waste Collection capital","Named purchases: two automated side-loading vehicles, one front-loading vehicle, one electric side-loading vehicle","Fleet equipment procurement — not a construction or design bid","FY25-26 capital drops slightly to $1,198,820","Electric side-loader purchase is part of the City's vehicle electrification trend"],
+  facts:["Solid Waste Collection Fund Capital: $1,258,400 (FY24-25); $1,198,820 (FY25-26)","Specific purchases: two automated side-loading vehicles, one front-loading vehicle, one electric side-loading vehicle","Fleet replacement uses a use-allowance model with 4% cost growth factor"],
+  inferences:["Fleet vendors (HEIL, McNeilus, Mack Trucks, Peterbilt, etc.) are the target — not design or construction firms","Electric refuse vehicle vendors should note the City's interest in electrification","No architecture or engineering services needed for fleet procurement"],
+  notes:"The Solid Waste Collection fleet replacement is an equipment procurement — not a construction or design opportunity. Refuse vehicle manufacturers and dealers are the targets. The City is purchasing one electric side-loading vehicle alongside conventional replacements, signaling interest in waste fleet electrification.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:11,name:"Roadway Maintenance Program (Gas Tax & Measure A)",cat:"Streets/Transportation",status:"Active Construction",fy:"2024-25",budget:7.86,fund:"Gas Tax / Measure A / TDA",score:3,hot:false,
+  signals:["Gas Tax & TDA: $5,366,458 FY24-25 (preventive maintenance focus)","Measure A (County half-cent): $2,496,908 FY24-25 in capital","Street maintenance contracts are recurring — likely on existing rotating contracts","Budget narrative: Enhanced Roadway Maintenance with additional GF contributions planned for 2026-28","Contractors already on City street maintenance contracts are positioned"],
+  facts:["Gas Tax & Transportation Development Act Fund capital: $5,366,458 (FY24-25); $5,066,458 (FY25-26)","County Measure A capital: $2,496,908 (FY24-25); $2,501,474 (FY25-26)","Gas Tax used for 'preventive annual maintenance of streets and appurtenant facilities and the construction of new public infrastructure within public rights-of-way'","Enhanced Roadway Maintenance (GF contributions) planned for FY 2026-28"],
+  inferences:["Street overlay, slurry seal, and crack repair contractors are the primary target — these are recurring annual contracts","Developer/Grant Street Projects Fund ($3.33M FY24-25) generates additional street construction packages tied to development activity","Bikeway construction projects in the future CIP (Depot/Railroad 2026-28, College Drive 2027-28) will generate civil design and construction procurement"],
+  notes:"The combined street maintenance program (Gas Tax + Measure A) represents approximately $7.86M in FY24-25 street capital, focused primarily on preventive maintenance. This is largely executed through existing rotating maintenance contracts. New design opportunity exists in the 2026-28 bikeway projects (Depot/Railroad Ave and College Drive). Firms not already on City street maintenance contracts should contact Public Works Director Brett Fulgoni to understand the competitive bid schedule.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:12,name:"Developer/Grant Street Projects Fund",cat:"Streets/Transportation",status:"Active Construction",fy:"2024-25",budget:3.33,fund:"Developer/Grant Street Projects Fund",score:3,hot:false,
+  signals:["$3,327,000 FY24-25 (up from $2.077M in FY23-24); $8,608,000 in FY25-26 — major ramp-up","Developer contributions and street grants fund new roadway extensions, bikeways, traffic signals","Multiple development-triggered street projects are in the pipeline given housing boom","FY25-26 jump to $8.6M suggests major developer contributions expected from Blosser Ranch (1,400 units) and other projects","New development projects like Blosser Ranch, Downtown mixed-use will trigger transportation improvements"],
+  facts:["Developer/Grant Street Projects Fund revenue/expenditure: $2,077,000 (FY23-24) → $3,327,000 (FY24-25) → $8,608,000 (FY25-26)","Used for: roadway extensions, new bikeways, roadway operational improvements, roadway safety enhancements","Blosser Ranch (~1,485 units), Downtown projects (Heritage Walk Lofts, Alvin Newton Apartments), and other active development trigger transportation mitigation","Depot/Railroad Bikeway and College Drive Bikeway are in 4-year CIP — funded by this source type"],
+  inferences:["Civil engineers and traffic engineers working with developers on new projects are positioned to capture this street work","The FY25-26 spike to $8.6M suggests major developer agreements are in process for 2025-26 — firms aligned with the active developers (Vernon Group downtown, Blosser Ranch developer) should be pursuing this work","Bikeway construction contractors and civil engineers should track the FY 2026-27 appropriation for Depot/Railroad Ave and College Drive bikeways"],
+  notes:"The Developer/Grant Street Projects Fund is growing significantly — $3.33M in FY24-25 and $8.6M in FY25-26 — driven by the active residential and commercial development pipeline. Blosser Ranch alone (1,485 units) will generate substantial transportation mitigation fees and off-site improvements. The Vernon Group's downtown mixed-use projects (Alvin Newton Apartments and Heritage Walk Lofts both expected to break ground in 2024) will also trigger street and utility improvements. Civil engineers working with active Santa Maria developers are best positioned to capture this work. The Depot/Railroad Bikeway and College Drive Bikeway (both in the 4-year CIP for 2026-28) will be funded through this mechanism.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:13,name:"Fire Station 2 — Relocation/Construction",cat:"Public Safety",status:"Future CIP (2026+)",fy:"2026+",budget:5.0,fund:"General Fund / Measure U (estimated)",score:3,hot:false,
+  signals:["Listed in Budget Message four-year CIP: 'Construction/Relocation of Fire Station 2 (2026-27)'","City stated it 'is working on another site for a future fire station' in community profile","Measure U funds 46.5% of Fire Department budget — likely a significant Measure U capital commitment","Site selection/acquisition process may be underway in FY24-25 or FY25-26","Together with Fire Training Facility, this is a two-project public safety facilities program"],
+  facts:["Budget Message CIP: 'Construction/Relocation of Fire Station 2 (2026-27)'","Community profile: 'The City has purchased 19 acres for a sports complex and is working on another site for a future fire station'","Fire Department total appropriations FY24-25: $25,708,413 (General Fund + Measure U)","Budget estimated — no standalone capital line item in FY24-25"],
+  inferences:["Site selection is likely in progress — a site acquisition agenda item at City Council would be the trigger to watch","Architects with California public safety and fire station design experience should be registering interest with Fire Chief Bradley Dandridge","Fire station construction in California typically requires DSA (Division of State Architect) review if serving educational functions; local building codes apply for public safety"],
+  notes:"Fire Station 2 relocation/construction is planned for FY 2026-27 per the budget's four-year CIP. The budget narrative notes the City is 'working on another site for a future fire station,' suggesting site selection is actively underway. Combined with the Fire Training Facility (FY25-26), Santa Maria has a two-project public safety facilities pipeline that will generate architect selection and construction procurement over the next 2-3 years. Architects with California fire station design experience should reach out to Fire Chief Bradley Dandridge.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:14,name:"Remote Transit Facility",cat:"Streets/Transportation",status:"Board Approved / Planning",fy:"2025-26",budget:3.0,fund:"Public Transit Fund (estimated)",score:3,hot:false,
+  signals:["Listed in Budget Message 4-year CIP: 'Remote Transit Facility (2025-26)'","Supports growing transit fleet and service expansion needs","Transit Administration Building (2025-27) is a related, concurrent transit facilities project","Transit fleet electrification drives need for additional charging infrastructure and storage","Transit Fund is healthy — $15.6M FY24-25, $16.2M FY25-26 appropriations"],
+  facts:["Listed in Budget Message CIP: 'Remote Transit Facility (2025-26)'","Transit Administration Building also listed: '(2025-27)' — separate project","Transit Fund FY24-25: $15,638,045; FY25-26: $16,224,857","Federal and State grants are the primary Transit Fund revenue sources"],
+  inferences:["A remote transit facility likely serves as a satellite maintenance/storage depot for the electric fleet","Architecture, civil engineering, and MEP firms with transit facility experience should be tracking this","Charging infrastructure contractors (Level 2 / DC Fast Charge installation) will be required for electric fleet depot","The Transit Administration Building is a separate, parallel procurement opportunity for architects"],
+  notes:"The Remote Transit Facility and Transit Administration Building represent two concurrent transit infrastructure projects in the FY 2025-26 time frame. The Remote Facility likely supports expanded electric fleet storage and maintenance capacity. Transit facility architects, civil engineers, and EV charging infrastructure specialists should be monitoring City Council agendas for design contract awards. Public Works Director Brett Fulgoni oversees the transit program.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:15,name:"Growth Mitigation Fund — Parks, Safety, Transportation Impact Fees",cat:"Parks/Recreation",status:"Active Construction",fy:"2024-25",budget:8.17,fund:"Growth Mitigation Fund",score:3,hot:false,
+  signals:["$8,167,000 in FY24-25 Growth Mitigation capital — up from prior years as development activity increases","Fund covers: traffic, recreation/parks, public safety facilities, and water/wastewater impact fees","Active development pipeline (Blosser Ranch, Downtown projects, ADUs) generates fee revenue","$4,952,720 in FY25-26 — still substantial","Sports Complex is likely primary beneficiary in this budget cycle"],
+  facts:["Growth Mitigation Fund (AB 1600 fees) FY24-25 capital: $8,167,000; FY25-26: $4,952,720","Fund covers: traffic, recreation and parks facilities, public safety facilities, and water/wastewater infrastructure","City development pipeline: 2,600+ housing units pending/approved entitlements","Blosser Ranch alone: ~1,485 units — major future fee generator"],
+  inferences:["Sports Complex is the dominant FY24-25 recipient — the $8.17M primarily funds this project based on narrative context","Future parks projects (Pocket Parks, FY 2026-28) will be funded from this pool","Firms working on the Sports Complex are most directly positioned for this fund in FY24-25"],
+  notes:"The Growth Mitigation Fund ($8.17M FY24-25) is the primary non-Enterprise capital source outside of street funds. Based on narrative context, the Sports Complex at Depot/Battles is the dominant FY24-25 recipient. Pocket Parks are planned for FY 2026-28 from this same pool. The active development pipeline (Blosser Ranch, 2,600+ pending entitlements) will continue generating fee revenue to replenish this fund.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:16,name:"BRT — Bus Rapid Transit Implementation",cat:"Streets/Transportation",status:"Future CIP (2026+)",fy:"2026+",budget:15.0,fund:"Public Transit / Federal Grants (estimated)",score:2,hot:false,
+  signals:["Listed in Budget Message 4-year CIP: 'BRT Implementation (2026-28)'","BRT requires dedicated transit corridors, signal priority, station improvements, and fleet","Large multi-year program — design in FY25-26, construction FY26-28 based on CIP timing","Federal capital grants are the primary funding mechanism for BRT projects","No design contract yet awarded — early planning phase"],
+  facts:["Budget Message CIP: 'BRT Implementation (2026-28)'","Budget estimated — no standalone capital line item in current 2-year budget"],
+  inferences:["Civil engineers, transit planners, and transportation design firms should begin relationship-building with Public Works Department now","BRT projects typically require FTA Small Starts or other federal grant processes — grant application work may be underway","Signal systems, shelter design, and transit operations consultants are all relevant to BRT planning","Construction timeline (2026-28) means design procurement likely in 2025-26"],
+  notes:"Bus Rapid Transit implementation is planned for 2026-28 per the four-year CIP. No funding has been appropriated in the current two-year budget. BRT projects in California typically require federal Small Starts or CMAQ grants. Transportation engineers, transit planners, and civil firms should track this for design procurement in FY25-26.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:17,name:"Depot Street / Railroad Ave Bikeway & College Drive Bikeway",cat:"Streets/Transportation",status:"Future CIP (2026+)",fy:"2026+",budget:5.0,fund:"Developer/Grant Street Projects (estimated)",score:2,hot:false,
+  signals:["Budget Message CIP: 'Depot Street and Railroad Avenue – Bikeway Project (construction in 2026-28)' and 'College Drive – Bikeway Project (construction in 2027-28)'","Funded through Developer/Grant Street Projects fund (which grows to $8.6M in FY25-26)","Design likely begins FY25-26 before construction in FY26-28","Active housing development near these corridors creates transportation improvement triggers","East Main Street Rehabilitation (construction 2027-28) is a parallel roadway project"],
+  facts:["Budget Message CIP: Depot/Railroad Ave Bikeway (2026-28), College Drive Bikeway (2027-28), East Main Street Rehabilitation (2027-28)","Developer/Grant Street Projects Fund: $8,608,000 in FY25-26"],
+  inferences:["Civil engineers and bikeway specialists should track for design RFQs in FY25-26","Design firms already working on city streetscape projects have relationship advantage","Construction contractors for bike lane infrastructure, signal modifications, and street improvements are targets for 2026-28"],
+  notes:"Three future CIP transportation projects in the 2026-28 timeframe: Depot/Railroad Ave Bikeway, College Drive Bikeway, and East Main Street Rehabilitation. Design procurement is likely in FY25-26. Civil engineers and transportation design firms should be monitoring City Council agendas for design contract awards beginning in mid-2025.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:18,name:"ADA Barrier Removal at Simas Field & Pocket Parks",cat:"Parks/Recreation",status:"Future CIP (2026+)",fy:"2026+",budget:2.0,fund:"Growth Mitigation / General Fund (estimated)",score:2,hot:false,
+  signals:["Budget Message CIP: 'ADA Barrier Removal at Simas Field (2026-27)' and 'Pocket Parks (2026-28)'","ADA barrier removal is a mandated accessibility improvement","Pocket Parks are community quality-of-life investments funded by Growth Mitigation"],
+  facts:["Budget Message CIP: ADA Barrier Removal at Simas Field (2026-27), Pocket Parks (2026-28)"],
+  inferences:["ADA access specialists, civil engineers, and landscape architects are the primary targets","Pocket parks can be landscape architecture or civil/site work depending on scope","Both projects are in the 2026+ horizon — not imminent but trackable"],
+  notes:"ADA Barrier Removal at Simas Field (FY2026-27) and Pocket Parks (FY2026-28) are both in the four-year CIP without current appropriations. These are smaller projects (estimated $500K–$2M each) that will generate design and construction procurement in 2025-26 for FY26-27/28 construction.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:19,name:"EV Infrastructure Expansion Phase 2",cat:"Facilities/Gov",status:"Future CIP (2026+)",fy:"2026+",budget:1.0,fund:"General Fund / Grants (estimated)",score:2,hot:false,
+  signals:["Budget Message CIP: 'EV Infrastructure Expansion Phase 2 (2026-28)'","City transitioning transit fleet to electric — EV infrastructure needed for City facilities/fleet","Electrical contractors with EV charging expertise are primary targets","Phase 1 likely already complete (not separately named in current budget)"],
+  facts:["Budget Message CIP: 'EV Infrastructure Expansion Phase 2 (2026-28)'"],
+  inferences:["Electrical contractors and EV charging system integrators should track for FY2025-26 design RFQ","Utility interconnection and load management may be required for large fleet charging installations","PG&E/utility coordination may be part of scope"],
+  notes:"EV Infrastructure Expansion Phase 2 is planned for FY 2026-28. With the City transitioning its transit fleet to electric and expected adoption of EV fleet vehicles for other departments, expanded charging infrastructure across City facilities will be needed. Electrical contractors with EV charging system experience should monitor City procurement.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]},
+
+  {id:20,name:"General Fund Capital Projects — Parks Lighting, Building Maintenance",cat:"Facilities/Gov",status:"Active Construction",fy:"2024-25",budget:3.51,fund:"Capital Projects – General Fund",score:3,hot:false,
+  signals:["$3,507,850 in GF Capital FY24-25; $2,849,658 FY25-26","Only $2.5M in GF capital was unfunded across 8 projects — confirms tight constraints","GF capital is limited to most essential projects: parks lighting, building maintenance, IT infrastructure","No large new GF construction projects are planned given deficit","Residential Development Tax Fund adds $500K/year for parks-related capital"],
+  facts:["Capital Projects – General Fund: $3,507,850 (FY24-25); $2,849,658 (FY25-26)","Budget: '8 General Fund projects were not funded due to funding limitations — $2.5 million in the first two years'","Residential Development Tax Fund: $500,000 FY24-25 (parks capital)","Library Fund: $5,517,537 FY24-25 (primarily operating support and capital)"],
+  inferences:["GF capital is focused on recurring maintenance, minor building improvements, and parks equipment — not major construction","Library and parks contractors doing routine maintenance work are positioned for this pool","Firms should not plan on significant new GF-funded construction projects until the structural deficit is resolved"],
+  notes:"The General Fund Capital Projects pool is tightly constrained at $3.5M in FY24-25, supporting essential minor improvements and maintenance. Eight projects were denied funding. This is not a productive hunting ground for significant new construction contracts. Firms should focus on Enterprise Fund (Utilities, Solid Waste, Transit) and Growth Mitigation-funded projects where the budget is robust.",
+  sources:[{label:"City of Santa Maria 2024-26 Adopted Biennial Budget",url:"https://www.cityofsantamaria.org/home/showpublisheddocument/32126/638602757918170000"}]}
+];
+
+let filtered=[...P], sortKey='score', sortDir=-1, expandedId=null;
+
+function init(){
+  document.getElementById('score45count').textContent=P.filter(p=>p.score>=4).length;
+  renderTable();
+}
+
+function applyFilters(){
+  const cat=document.getElementById('fCat').value, st=document.getElementById('fStatus').value,
+        fy=document.getElementById('fFy').value, sc=document.getElementById('fScore').value,
+        q=document.getElementById('fSearch').value.toLowerCase();
+  filtered=P.filter(p=>{
+    if(cat&&p.cat!==cat)return false;
+    if(st&&p.status!==st)return false;
+    if(sc&&p.score!==parseInt(sc))return false;
+    if(fy){
+      if(fy==='2024-25'&&p.fy!=='2024-25')return false;
+      if(fy==='2025-26'&&p.fy!=='2025-26')return false;
+      if(fy==='2026+'&&p.fy!=='2026+')return false;
+    }
+    if(q){const hay=[p.name,p.cat,p.status,p.fund,p.notes,...(p.signals||[])].join(' ').toLowerCase();if(!hay.includes(q))return false;}
+    return true;
+  });
+  sortF(); renderTable();
+}
+
+function qf(field,value){
+  ['fCat','fStatus','fFy','fScore','fSearch'].forEach(id=>document.getElementById(id).value='');
+  if(field==='cat')document.getElementById('fCat').value=value;
+  else if(field==='status')document.getElementById('fStatus').value=value;
+  else if(field==='fy')document.getElementById('fFy').value=value;
+  else if(field==='score')document.getElementById('fScore').value=value;
+  applyFilters();
+}
+
+function resetFilters(){
+  ['fCat','fStatus','fFy','fScore','fSearch'].forEach(id=>document.getElementById(id).value='');
+  filtered=[...P]; sortF(); renderTable();
+}
+
+function sb(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=-1;}sortF();renderTable();}
+function sortF(){filtered.sort((a,b)=>{let av=a[sortKey]??-Infinity,bv=b[sortKey]??-Infinity;if(typeof av==='string')return sortDir*av.localeCompare(bv);return sortDir*(av-bv);});}
+
+function catBadge(cat){const cls=CAT_CLASSES[cat]||'cat-facilities';return`<span class="cat-badge ${cls}">${cat}</span>`;}
+function spill(s){const m={'Active Construction':'s-active','Board Approved / Planning':'s-planning','Future CIP (2026+)':'s-future'};return`<span class="status-pill ${m[s]||'s-planning'}">${s}</span>`;}
+function fmtM(v){if(v===null||v===undefined)return'<span style="color:var(--muted)">N/A</span>';return'$'+v.toFixed(1)+'M';}
+
+function renderTable(){
+  const tb=document.getElementById('tBody'), rc=document.getElementById('rCount');
+  rc.textContent=`${filtered.length} project${filtered.length!==1?'s':''}`;
+  if(!filtered.length){tb.innerHTML='<tr><td colspan="10" class="no-results">No projects match your filters.</td></tr>';return;}
+  let h='';
+  filtered.forEach(p=>{
+    const sig=(p.signals||[]).slice(0,3).map(s=>`<div class="signal-chip">${s}</div>`).join('');
+    const hot=p.hot?'<span class="hot-badge">Hot</span>':'';
+    const ex=expandedId===p.id;
+    h+=`<tr onclick="toggleExp(${p.id})" class="${ex?'expanded':''}">
+      <td class="et">${ex?'▲':'▼'}</td>
+      <td><div class="project-name">${p.name}${hot}</div></td>
+      <td>${catBadge(p.cat)}</td>
+      <td>${spill(p.status)}</td>
+      <td style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace">${p.fy}</td>
+      <td><span class="budget-val">${fmtM(p.budget)}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${p.fund}</td>
+      <td><span class="score-dot score-${p.score}">${p.score}</span></td>
+      <td><div class="signals-cell">${sig}</div></td>
+      <td></td></tr>`;
+    if(ex){
+      const fcts=(p.facts||[]).map(f=>`<div class="fi"><span class="fb c">■</span><span>${f}</span></div>`).join('');
+      const infs=(p.inferences||[]).map(f=>`<div class="fi"><span class="fb i">◆</span><span>${f}</span></div>`).join('');
+      const sigs=(p.signals||[]).map(s=>`<li class="signal-item">${s}</li>`).join('');
+      const srcs=(p.sources||[]).map(s=>`<a class="src-link" href="${s.url}" target="_blank">↗ ${s.label}</a>`).join('');
+      h+=`<tr class="detail-row"><td colspan="10"><div class="detail-panel">
+        <div class="dc"><div class="dc-title">Analysis</div><div class="detail-analysis">${p.notes}</div></div>
+        <div class="dc"><div class="dc-title">Confirmed Facts</div>${fcts}<div class="dc-title" style="margin-top:14px">Inferences &amp; Implications</div>${infs}</div>
+        <div class="dc"><div class="dc-title">All Signals</div><ul class="signal-list">${sigs}</ul><div class="src-label">Sources</div>${srcs}</div>
+      </div></td></tr>`;
+    }
+  });
+  tb.innerHTML=h;
+}
+
+function toggleExp(id){expandedId=expandedId===id?null:id;renderTable();}
+
+function exportCSV(){
+  const cols=['name','cat','status','fy','budget','fund','score'];
+  let csv=cols.join(',')+'\n';
+  filtered.forEach(p=>{const row=cols.map(c=>{let v=p[c];if(v===null||v===undefined)v='';return'"'+String(v).replace(/"/g,'""')+'"';});csv+=row.join(',')+'\n';});
+  dl('santa_maria_capital.csv',csv,'text/csv');
+}
+function exportJSON(){dl('santa_maria_capital.json',JSON.stringify(filtered,null,2),'application/json');}
+function dl(fn,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=fn;a.click();}
+
+function printSummary(){
+  const win=window.open('','_blank');
+  const rows=filtered.map(p=>`<tr><td>${p.name}</td><td>${p.cat}</td><td>${p.status}</td><td>${p.fy}</td><td>${p.budget?'$'+p.budget.toFixed(1)+'M':'N/A'}</td><td>${p.fund}</td><td style="font-weight:700;text-align:center">${p.score}</td><td style="font-size:10px">${(p.signals||[]).slice(0,2).join('; ')}</td></tr>`).join('');
+  win.document.write(`<!DOCTYPE html><html><head><title>Santa Maria Capital Projects</title><style>body{font-family:sans-serif;font-size:11px;margin:20px}h1{font-size:15px;margin-bottom:4px}p{font-size:10px;color:#666;margin-bottom:12px}table{width:100%;border-collapse:collapse}th{background:#1A1916;color:#fff;padding:6px 8px;text-align:left;font-size:10px}td{border-bottom:1px solid #ddd;padding:5px 8px;vertical-align:top}@media print{@page{size:landscape;margin:1cm}}</style></head><body><h1>City of Santa Maria — Capital Projects Opportunity Summary</h1><p>Source: 2024-26 Adopted Biennial Budget · ${filtered.length} projects · ${new Date().toLocaleDateString()}</p><table><thead><tr><th>Project</th><th>Category</th><th>Status</th><th>FY</th><th>Budget</th><th>Fund</th><th>Score</th><th>Top Signals</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  win.document.close();win.print();
+}
+
+sortKey='score';sortDir=-1;sortF();init();
+</script>
+</body>
+</html>
