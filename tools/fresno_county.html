@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>County of Fresno — Capital Program Intelligence Tool</title>
+<style>
+  :root {
+    --bg: #0c0f13;
+    --surface: #141820;
+    --surface2: #1a202c;
+    --border: #252d3a;
+    --accent: #c9501a;
+    --accent2: #a83e12;
+    --gold: #d4a017;
+    --green: #22c55e;
+    --red: #ef4444;
+    --orange: #f97316;
+    --teal: #14b8a6;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #4b5b72;
+    --fc-navy: #1a2a4a;
+    --fc-red: #c9501a;
+    --fc-gold: #d4a017;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #080c12 0%, #1a2a4a 55%, #0d1624 100%);
+    border-bottom: 3px solid var(--fc-red);
+    padding: 22px 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .agency-badge { display: flex; align-items: center; gap: 14px; }
+
+  .agency-seal {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c9501a, #f4812c);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900;
+    color: #fff; flex-shrink: 0;
+    font-family: 'Georgia', serif;
+    letter-spacing: -1px;
+  }
+
+  .agency-name { font-size: 21px; font-weight: 700; color: #fff; letter-spacing: -0.3px; font-family: 'Georgia', serif; }
+  .agency-sub { font-size: 11px; color: var(--fc-gold); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  .header-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+
+  .meta-pill {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(212,160,23,0.35);
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 12px;
+    color: #cbd5e1;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  .meta-pill span { color: var(--fc-gold); font-weight: 700; }
+
+  /* MAIN */
+  .main { max-width: 1440px; margin: 0 auto; padding: 24px 20px; }
+
+  /* BUDGET BARS */
+  .budget-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .budget-bar-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .budget-bar-card .label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 4px; font-family: 'Segoe UI', system-ui, sans-serif; }
+  .budget-bar-card .amount { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 8px; font-family: 'Georgia', serif; }
+  .budget-bar-card .bar-bg { background: var(--border); height: 5px; border-radius: 3px; overflow: hidden; }
+  .budget-bar-card .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--fc-red), var(--fc-gold)); }
+  .budget-bar-card .sub { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  /* INTEL GRID */
+  .intel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .intel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+  }
+
+  .intel-card h3 {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: var(--fc-gold);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 7px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .intel-body { font-size: 13px; color: var(--text2); line-height: 1.65; font-family: 'Segoe UI', system-ui, sans-serif; }
+  .intel-body ul { padding-left: 0; list-style: none; }
+  .intel-body ul li {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; gap: 8px;
+  }
+  .intel-body ul li:last-child { border-bottom: none; }
+  .intel-body ul li::before { content: '→'; color: var(--fc-red); flex-shrink: 0; }
+
+  .tag-confirmed { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; letter-spacing: 0.5px; font-family: 'Segoe UI', sans-serif; }
+  .tag-inferred { background: rgba(212,160,23,0.12); border: 1px solid rgba(212,160,23,0.3); color: #fbbf24; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; letter-spacing: 0.5px; font-family: 'Segoe UI', sans-serif; }
+  .tag-watch { background: rgba(249,115,22,0.12); border: 1px solid rgba(249,115,22,0.3); color: #fb923c; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; letter-spacing: 0.5px; font-family: 'Segoe UI', sans-serif; }
+
+  /* CONTROLS */
+  .controls {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .controls input[type=text] {
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px;
+    padding: 8px 12px; font-size: 13px; width: 220px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .controls input[type=text]:focus { outline: none; border-color: var(--fc-red); }
+
+  .controls select {
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px;
+    padding: 8px 10px; font-size: 13px; cursor: pointer;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .quick-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .qf-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); border-radius: 20px;
+    padding: 5px 12px; font-size: 12px; cursor: pointer;
+    transition: all 0.15s; font-family: 'Segoe UI', sans-serif;
+  }
+  .qf-btn:hover, .qf-btn.active { background: var(--fc-red); border-color: var(--fc-red); color: #fff; }
+
+  /* TABLE */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+
+  .table-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--surface2);
+  }
+  .table-header h2 { font-size: 14px; font-weight: 700; color: var(--text); font-family: 'Georgia', serif; }
+  .table-header .count { font-size: 12px; color: var(--text3); background: var(--bg); border: 1px solid var(--border); padding: 3px 10px; border-radius: 12px; font-family: 'Segoe UI', sans-serif; }
+
+  .export-btns { display: flex; gap: 8px; }
+  .export-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text2); border-radius: 5px; padding: 5px 10px; font-size: 11px; cursor: pointer; transition: all 0.15s; font-family: 'Segoe UI', sans-serif; }
+  .export-btn:hover { border-color: var(--fc-red); color: var(--fc-red); }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    background: #0a0e15; color: var(--text3);
+    font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; padding: 10px 14px;
+    text-align: left; border-bottom: 1px solid var(--border);
+    position: sticky; top: 91px; cursor: pointer; user-select: none;
+    white-space: nowrap; font-family: 'Segoe UI', sans-serif;
+  }
+  thead th:hover { color: var(--text); }
+
+  tbody tr { border-bottom: 1px solid rgba(37,45,58,0.6); cursor: pointer; transition: background 0.1s; }
+  tbody tr:hover { background: rgba(201,80,26,0.05); }
+  tbody tr.expanded { background: rgba(201,80,26,0.07); }
+
+  td { padding: 11px 14px; font-size: 13px; vertical-align: middle; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  td.project-name { font-weight: 600; color: var(--text); max-width: 280px; }
+  td.project-name .expand-indicator {
+    display: inline-block; width: 16px; height: 16px;
+    border-radius: 3px; background: var(--surface2); border: 1px solid var(--border);
+    text-align: center; line-height: 15px; font-size: 10px;
+    margin-right: 8px; color: var(--text3); flex-shrink: 0; vertical-align: middle;
+  }
+
+  .score-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 6px;
+    font-size: 14px; font-weight: 800; font-family: 'Georgia', serif;
+  }
+  .score-5 { background: rgba(34,197,94,0.18); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+  .score-4 { background: rgba(59,130,246,0.18); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  .score-3 { background: rgba(212,160,23,0.18); color: #fbbf24; border: 1px solid rgba(212,160,23,0.3); }
+  .score-2 { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+  .score-1 { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+
+  .category-pill { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; }
+  .cat-justice { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
+  .cat-facilities { background: rgba(201,80,26,0.15); color: #fb923c; border: 1px solid rgba(201,80,26,0.2); }
+  .cat-roads { background: rgba(212,160,23,0.15); color: #fbbf24; border: 1px solid rgba(212,160,23,0.2); }
+  .cat-water { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+  .cat-parks { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+  .cat-courts { background: rgba(236,72,153,0.15); color: #f472b6; border: 1px solid rgba(236,72,153,0.2); }
+  .cat-transport { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid rgba(20,184,166,0.2); }
+
+  .status-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+  .status-active { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .status-design { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .status-planning { background: rgba(212,160,23,0.15); color: #fbbf24; }
+  .status-acquisition { background: rgba(139,92,246,0.15); color: #a78bfa; }
+  .status-future { background: rgba(75,91,114,0.2); color: #94a3b8; }
+
+  .budget-cell { font-weight: 700; font-size: 13px; white-space: nowrap; font-family: 'Georgia', serif; }
+
+  /* DETAIL ROW */
+  .detail-row { display: none; }
+  .detail-row.open { display: table-row; }
+  .detail-cell { padding: 0 !important; border-bottom: 2px solid var(--fc-red) !important; }
+  .detail-inner {
+    background: #0d1118;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+
+  .detail-section h4 {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text3);
+    margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .detail-section h4::before { content: ''; display: block; width: 3px; height: 12px; background: var(--fc-gold); border-radius: 2px; }
+
+  .detail-section ul { list-style: none; padding: 0; }
+  .detail-section ul li {
+    font-size: 12px; color: var(--text2); padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; gap: 7px; align-items: flex-start;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .detail-section ul li:last-child { border-bottom: none; }
+  .detail-section ul li span.bullet { color: var(--fc-gold); flex-shrink: 0; font-size: 10px; margin-top: 3px; }
+  .detail-section ul li.inferred span.bullet { color: #fbbf24; }
+
+  .sources-list { font-size: 11px; color: var(--text3); font-family: 'Segoe UI', sans-serif; }
+  .sources-list a { color: #60a5fa; text-decoration: none; }
+  .sources-list a:hover { text-decoration: underline; }
+  .sources-list div { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .sources-list div:last-child { border-bottom: none; }
+
+  footer { text-align: center; padding: 20px; color: var(--text3); font-size: 11px; border-top: 1px solid var(--border); margin-top: 32px; font-family: 'Segoe UI', sans-serif; }
+
+  @media (max-width: 900px) { .detail-inner { grid-template-columns: 1fr; } .intel-grid { grid-template-columns: 1fr; } .budget-overview { grid-template-columns: 1fr 1fr; } }
+
+  .no-results { text-align: center; padding: 40px; color: var(--text3); font-size: 14px; font-family: 'Segoe UI', sans-serif; }
+  .sort-indicator { margin-left: 4px; opacity: 0.5; }
+  .sort-indicator.active { opacity: 1; color: var(--fc-gold); }
+
+  .funding-badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    background: rgba(212,160,23,0.12); border: 1px solid rgba(212,160,23,0.3);
+    color: var(--fc-gold); padding: 1px 6px; border-radius: 4px; margin-left: 5px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="agency-badge">
+      <div class="agency-seal">FC</div>
+      <div>
+        <div class="agency-name">County of Fresno</div>
+        <div class="agency-sub">Capital Program Intelligence Tool — FY 2025-26 &amp; Forward</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-pill">Total Budget: <span>$5.3B (FY 2025-26)</span></div>
+      <div class="meta-pill">Capital Projects (FY23-24): <span>~$109M</span></div>
+      <div class="meta-pill">Road System: <span>3,555 mi / 544 bridges</span></div>
+      <div class="meta-pill">Measure C Expiry: <span>June 2027</span></div>
+      <div class="meta-pill">Updated: <span>April 2026</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- BUDGET OVERVIEW -->
+  <div class="budget-overview">
+    <div class="budget-bar-card">
+      <div class="label">Courthouse / Judicial</div>
+      <div class="amount">$945M</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div>
+      <div class="sub">State-funded design-build · July 2026 start · Completes 2032</div>
+    </div>
+    <div class="budget-bar-card">
+      <div class="label">Sheriff Facilities</div>
+      <div class="amount">~$35M+</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:35%"></div></div>
+      <div class="sub">$25M acquisition (O/P St.) + TI + demolition prep</div>
+    </div>
+    <div class="budget-bar-card">
+      <div class="label">Board/CAO HQ &amp; Parking</div>
+      <div class="amount">$41.7M+</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:42%"></div></div>
+      <div class="sub">Reserved · Site TBD · +$10.5M parking structure</div>
+    </div>
+    <div class="budget-bar-card">
+      <div class="label">Roads &amp; Bridges</div>
+      <div class="amount">$109M+</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:55%"></div></div>
+      <div class="sub">Road Fund + Measure C + STIP · 3,555 mi / 544 bridges</div>
+    </div>
+    <div class="budget-bar-card">
+      <div class="label">Water / ARPA Infrastructure</div>
+      <div class="amount">~$35M</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:30%"></div></div>
+      <div class="sub">ARPA water projects · Malaga, Riverdale, Caruthers &amp; others</div>
+    </div>
+    <div class="budget-bar-card">
+      <div class="label">Parks &amp; Libraries (ARPA + annual)</div>
+      <div class="amount">~$12M</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:12%"></div></div>
+      <div class="sub">Kearney Park + rural parks + library branch capital</div>
+    </div>
+  </div>
+
+  <!-- INTEL SECTIONS -->
+  <div class="intel-grid">
+
+    <div class="intel-card">
+      <h3>🎯 Clearest Near-Term Paths (Active / Imminent)</h3>
+      <div class="intel-body">
+        <ul>
+          <li>New Fresno Courthouse — $945.9M state design-build. Construction start July 2026, completion January 2032. Design-Build RFQ/RFP expected from Judicial Council 2026. Largest single project in county history. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Sheriff Admin Building Tenant Improvements — County voted 4-0 April 7, 2026 to acquire 650 O St. and 705 P St. ($25M). Sale closes July 7, 2026. TI work begins immediately — sheriff needs to move out by April 2027. High urgency. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Existing Sheriff/South Annex Jail Demolition — Required before courthouse construction begins. County must vacate and demolish current Sheriff HQ at Courthouse Park. Demolition contract to be bid by County or Judicial Council. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Bridge Preventive Maintenance / Replacement Program — Active ongoing bid cycle. Jacalitos Creek Bridge on Lost Hills Rd awarded May 2025 to Cal Valley Construction. Scour maintenance program (25-17-M) currently bidding. County has 544 bridges. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Elkhorn Recharge Facility (ARPA water) — $6M, expected completion by 2027. Groundwater recharge for North Fork Kings GSA area. <span class="tag-confirmed">CONFIRMED</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intel-card">
+      <h3>🔭 Intelligence &amp; Inferences</h3>
+      <div class="intel-body">
+        <ul>
+          <li>FY 2025-26 county budget used $6M from the Hall of Records Improvement Fund to balance operations — signals facility capital is under pressure. Hall of Records renovation may slip. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Measure C expires June 2027. Two competing ballot replacement measures (Better Roads/Safe Streets and Fix Our Roads) both filed for Nov 2026. Outcome determines $3.9B+ in 20-year transportation construction pipeline. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Deferred maintenance: county estimates ~$1.6B in deferred road maintenance for unincorporated areas. Regardless of Measure C outcome, catch-up capital spend is inevitable. <span class="tag-inferred">INFERRED</span></li>
+          <li>Sheriff must vacate courthouse park campus by ~April 2027 — compressed timeline creates rush on TI work at O/P St. buildings. High likelihood of CM engagement and fast-track procurement. <span class="tag-inferred">INFERRED</span></li>
+          <li>County has $41.7M reserved for Board/CAO new headquarters and $10.5M for parking structure. Site decision pending. Construction likely 2027+ but A/E selection may begin 2026. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>New courthouse is design-build by Judicial Council of California (state agency) — procurement will come from state, not county. County-side opportunities are pre-construction site prep, demolition, and utility relocation. <span class="tag-inferred">INFERRED</span></li>
+          <li>ARPA water infrastructure: 82 programs with majority of unspent funds in Water/Sewer/Broadband and Subrecipient categories. Multiple small-to-mid water projects in DACs (Malaga, Riverdale, Caruthers, Mendota, Raisin City) actively underway through 2026. <span class="tag-confirmed">CONFIRMED</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intel-card">
+      <h3>⚠️ Structural Constraints &amp; Red Flags</h3>
+      <div class="intel-body">
+        <ul>
+          <li>County budget under stress: $15M one-time funds used to balance FY 2025-26, including $6M from capital reserves and $8M from Prop 172 fund balance. Near-term discretionary capital is constrained. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Measure C uncertainty: if both ballot measures fail or are invalidated, $109M+ in annual Fresno County transportation funding disappears after June 2027. This is an existential risk for roads/bridges pipeline. <span class="tag-watch">WATCH</span></li>
+          <li>Federal funding uncertainty: county DHS/SNAP/Medicaid cuts are primary concern. Less direct impact on capital, but if general fund shrinks, capital transfers could be raided again. <span class="tag-watch">WATCH</span></li>
+          <li>Courthouse site EIR: environmental review underway Dec 2025. CEQA completion required before construction can start. State Judicial Council is exempt from local land use rules — streamlined, but still has timeline risk. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Half of unincorporated rural roads not on county-maintained system — ineligible for Measure C or most grant programs. Creates equity and funding gap for rural infrastructure. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Sheriff facility acquisition still in 90-day due diligence. PG&E must vacate O/P St. buildings first. If deal falls through, Sheriff relocation timeline collapses. <span class="tag-watch">WATCH</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intel-card">
+      <h3>🏢 Best Targets by Firm Type</h3>
+      <div class="intel-body">
+        <ul>
+          <li><strong style="color:var(--text)">Architecture / Structural Engineering</strong> — Sheriff Admin TI at O/P St. (urgent, 1-year delivery window), Board/CAO new HQ design (A/E selection likely 2026), Juvenile Justice Campus facility improvements.</li>
+          <li><strong style="color:var(--text)">Civil / Demolition / Site Work</strong> — Courthouse site demolition (Sheriff HQ + South Annex Jail), courthouse utility relocation and site prep, bridge scour and preventive maintenance programs (ongoing bid cycle).</li>
+          <li><strong style="color:var(--text)">Bridge / Heavy Civil</strong> — 544-bridge county system with active replacement and maintenance bid cycle. Scour program, Jacalitos model (Cal Valley). Watch for bundled bridge packages in 2026.</li>
+          <li><strong style="color:var(--text)">Road / Pavement</strong> — Measure C road maintenance and resurfacing ongoing. Pre-Measure C expiry acceleration possible as county rushes to use remaining funds before June 2027. Rural county road pavement a recurring annual program.</li>
+          <li><strong style="color:var(--text)">Water / Environmental / Geotechnical</strong> — ARPA water projects in DACs (wells, storage tanks, pipeline, treatment). Elkhorn Recharge Facility construction ongoing. Multiple water district CIP projects in unincorporated communities.</li>
+          <li><strong style="color:var(--text)">Program / Construction Management</strong> — County has thin internal delivery capacity for a compressed multi-project period (courthouse site prep, sheriff TI, HQ design all overlapping). High probability of owner's rep or PM contract.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intel-card">
+      <h3>🚦 Watchlist Triggers</h3>
+      <div class="intel-body">
+        <ul>
+          <li>Board of Supervisors agendas (1st &amp; 3rd Tuesdays) — watch for Sheriff acquisition closure confirmation (July 2026), TI contract approval, Board/CAO HQ site selection, and Measure C fiscal/legal analysis.</li>
+          <li>Judicial Council of California (courts.ca.gov) — courthouse EIR Draft publication, site acquisition completion, and Design-Build RFQ/RFP release. This is the largest active construction opportunity in the Central Valley.</li>
+          <li>County PWP bid portal (fresnocountyca.gov) — new bridge, road, and facility bids posted Tuesdays. On-call environmental consultants RFP closed 2025 — successor contract likely 2026.</li>
+          <li>November 2026 ballot — Measure C replacement vote. If either "Better Roads/Safe Streets" or "Fix Our Roads" passes, a 20-year, ~$3.9B transportation capital program activates. Program management and early design opportunities will follow fast.</li>
+          <li>ARPA deadline: all ARPA funds must be obligated by Dec. 31, 2026 and expended by Dec. 31, 2028. County still has unobligated water/broadband funds — urgency to place final contracts is high in 2026.</li>
+          <li>Ag Commissioner / Sealer Building — repeatedly funded in annual budgets since FY 2022-23 ($8M allocated; design completed). Construction procurement may be imminent — watch county purchasing portal.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intel-card">
+      <h3>📚 How to Read the Scoring (1–5 Rubric)</h3>
+      <div class="intel-body">
+        <ul>
+          <li><strong style="color:#4ade80">5 — Highest Confidence:</strong> Active procurement, board-approved funding, hard delivery deadline. Bid imminent or contract underway.</li>
+          <li><strong style="color:#60a5fa">4 — High Confidence:</strong> Funded and scoped. Procurement timeline clear. Political will confirmed. Within 12 months of bid.</li>
+          <li><strong style="color:#fbbf24">3 — Medium Confidence:</strong> Funded in principle or budget reserved. Scope still forming or site TBD. 1–3 year horizon.</li>
+          <li><strong style="color:#fb923c">2 — Lower Confidence:</strong> In plan but contingent on external decisions (ballot measure, site selection, interagency coordination). Monitor actively.</li>
+          <li><strong style="color:#f87171">1 — Watch / Uncertain:</strong> Related program, non-county funded, or highly contingent. Worth tracking but not an immediate pursuit.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="🔍  Search projects...">
+    <select id="catFilter">
+      <option value="">All Categories</option>
+      <option value="Courts/Judicial">Courts / Judicial</option>
+      <option value="Justice/Sheriff">Justice / Sheriff</option>
+      <option value="County Facilities">County Facilities</option>
+      <option value="Roads/Bridges">Roads &amp; Bridges</option>
+      <option value="Water/Environmental">Water / Environmental</option>
+      <option value="Parks/Libraries">Parks &amp; Libraries</option>
+      <option value="Transportation">Transportation Program</option>
+    </select>
+    <select id="statusFilter">
+      <option value="">All Status</option>
+      <option value="Active/Construction">Active / Construction</option>
+      <option value="Acquisition">Acquisition</option>
+      <option value="Design/Procurement">Design / Procurement</option>
+      <option value="Planning">Planning</option>
+      <option value="Future">Future / Contingent</option>
+    </select>
+    <select id="scoreFilter">
+      <option value="">All Scores</option>
+      <option value="5">Score 5</option>
+      <option value="4">Score 4</option>
+      <option value="3">Score 3</option>
+      <option value="2">Score 2</option>
+      <option value="1">Score 1</option>
+    </select>
+    <div class="quick-filters">
+      <button class="qf-btn" onclick="applyQuickFilter('active')">Active Now</button>
+      <button class="qf-btn" onclick="applyQuickFilter('courts')">Courthouse</button>
+      <button class="qf-btn" onclick="applyQuickFilter('roads')">Roads/Bridges</button>
+      <button class="qf-btn" onclick="applyQuickFilter('water')">Water</button>
+      <button class="qf-btn" onclick="applyQuickFilter('top')">Score 4–5</button>
+      <button class="qf-btn" onclick="applyQuickFilter('clear')">Clear All</button>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <h2>Project Opportunity Inventory</h2>
+      <div style="display:flex;gap:12px;align-items:center">
+        <span class="count" id="rowCount">— projects</span>
+        <div class="export-btns">
+          <button class="export-btn" onclick="exportCSV()">⬇ CSV</button>
+          <button class="export-btn" onclick="window.print()">🖨 Print</button>
+        </div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+    <table id="projectTable">
+      <thead>
+        <tr>
+          <th onclick="sortTable('score')">Score <span class="sort-indicator active" id="sort-score">▼</span></th>
+          <th onclick="sortTable('name')">Project Name <span class="sort-indicator" id="sort-name"></span></th>
+          <th onclick="sortTable('category')">Category <span class="sort-indicator" id="sort-category"></span></th>
+          <th onclick="sortTable('budget')">Est. Value <span class="sort-indicator" id="sort-budget"></span></th>
+          <th onclick="sortTable('funding')">Funding Source <span class="sort-indicator" id="sort-funding"></span></th>
+          <th onclick="sortTable('status')">Status <span class="sort-indicator" id="sort-status"></span></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    </div>
+    <div class="no-results" id="noResults" style="display:none">No projects match your filters.</div>
+  </div>
+
+</div>
+
+<footer>
+  County of Fresno · Capital Program Intelligence Tool · FY 2025-26<br>
+  Sources: Fresnoland, GV Wire, Mid Valley Times, KVPR, Fresno Business Journal, Judicial Council of California, US Treasury ARPA Recovery Plan (2025), County Board of Supervisors agendas, California DOF Budget Change Proposals<br>
+  Generated April 2026 · For internal business development use only
+</footer>
+
+<script>
+const projects = [
+  {
+    id: 1,
+    name: "New Fresno County Courthouse — Design-Build",
+    category: "Courts/Judicial",
+    catClass: "cat-courts",
+    budget: 945937000,
+    budgetDisplay: "$945.9M",
+    funding: "State (Judicial Council)",
+    status: "Design/Procurement",
+    statusClass: "status-design",
+    score: 5,
+    facts: [
+      "Total project cost: $945,937,000 per California DOF FY 2025-26 Budget Change Proposal",
+      "11-story, 413,000 SF, 36-courtroom courthouse at M Street and Fresno Street in Courthouse Park",
+      "Design-Build delivery method confirmed by Judicial Council",
+      "Construction start July 2026 per one state document; another source says Nov 2028 — EIR timeline will determine final schedule",
+      "CEQA Notice of Preparation issued December 2025 — Draft EIR underway",
+      "Project will demolish existing Sheriff Administration Building and South Annex Jail",
+      "Will consolidate 3 existing court facilities; provides 2 additional courtrooms for future judgeships",
+      "LEED Silver minimum required; secure parking for judicial officers included"
+    ],
+    inferences: [
+      "Design-Build RFQ/RFP from Judicial Council expected 2026 — largest single construction opportunity in Central Valley",
+      "County's pre-construction obligations: demolish Sheriff HQ and South Annex Jail before state can build — separate county-let contracts",
+      "Underground tunnel connecting courthouse to nearby facilities preserved — utility and civil coordination required",
+      "Judicial Council is a state agency exempt from local land use rules — procurement comes from state, not county",
+      "A/E firms should track Judicial Council prequalification lists and contact Judicial Council Facilities Services now"
+    ],
+    sources: [
+      { label: "Judicial Council — New Fresno Courthouse Project Page", url: "https://courts.ca.gov/facilities/fresno-county-new-fresno-courthouse" },
+      { label: "California DOF FY 2025-26 BCP — $945.9M Courthouse", url: "https://bcp.dof.ca.gov/2526/FY2526_ORG0250_BCP7712.pdf" },
+      { label: "CEQA NOP — December 2025", url: "https://ceqanet.lci.ca.gov/2025111159" }
+    ]
+  },
+  {
+    id: 2,
+    name: "Sheriff Admin Building — Acquisition &amp; Tenant Improvements (650 O St / 705 P St)",
+    category: "Justice/Sheriff",
+    catClass: "cat-justice",
+    budget: 28000000,
+    budgetDisplay: "~$28M+",
+    funding: "County General Fund",
+    status: "Acquisition",
+    statusClass: "status-acquisition",
+    score: 5,
+    facts: [
+      "Board of Supervisors voted 4-0 on April 7, 2026 to begin acquiring two commercial office buildings at 650 O St. and 705 P St.",
+      "$25M purchase price for two former PG&E buildings totaling nearly 300,000 SF",
+      "Sale closes July 7, 2026 following 90-day due diligence",
+      "Sheriff must vacate current Courthouse Park location by April 2027",
+      "Both buildings need security improvements; one for sheriff admin, one for Hall of Records admin staff",
+      "PG&E is current tenant; expected to vacate soon",
+      "Sheriff Zanoni: 'once this sale goes through, we're going to be full steam ahead on improvements'"
+    ],
+    inferences: [
+      "TI/security improvement contracts expected immediately after July 2026 close — extremely compressed timeline",
+      "300,000 SF of former office space requires full buildout: secure entry, evidence storage, detention areas, IT/communications infrastructure",
+      "County will likely need CM or owner's rep to manage fast-track delivery given internal capacity constraints",
+      "Could involve life-safety, ADA upgrades, MEP renovation given buildings were built 1989",
+      "Parallel demolition of old Sheriff HQ at Courthouse Park is a separate county contract opportunity"
+    ],
+    sources: [
+      { label: "Fresnoland — Sheriff New Office (April 7, 2026)", url: "https://fresnoland.org/2026/04/07/fresno-sheriffs-new-office/" },
+      { label: "NewsBreak / Fresno Bee — Sheriff Acquisition", url: "https://www.newsbreak.com/the-fresno-bee-1592569/4582621577142-new-home-for-fresno-county-sheriff-s-office-supervisors-make-tentative-purchase" }
+    ]
+  },
+  {
+    id: 3,
+    name: "Demolition — Sheriff Administration &amp; South Annex Jail at Courthouse Park",
+    category: "Justice/Sheriff",
+    catClass: "cat-justice",
+    budget: 8000000,
+    budgetDisplay: "~$8M est.",
+    funding: "County / Judicial Council (TBD)",
+    status: "Planning",
+    statusClass: "status-planning",
+    score: 5,
+    facts: [
+      "Demolition of existing Sheriff Administration and South Annex Jail buildings is required before new courthouse can be built",
+      "New courthouse site is 2.09 acres at M Street and Fresno Street — current buildings must be cleared",
+      "Sheriff move-out deadline approximately April 2027",
+      "Demolition scope confirmed in CEQA NOP for courthouse — includes site preparation, grading, utility disconnection",
+      "County is responsible for clearing the site; Judicial Council then constructs new courthouse on cleared land"
+    ],
+    inferences: [
+      "Demolition contract likely to be let by County Public Works — watch county bid portal",
+      "Underground tunnel to adjacent facilities must be managed carefully during demo",
+      "Asbestos, hazardous materials abatement likely given age of buildings",
+      "Site utility relocation is a separate and parallel work item",
+      "Timeline is directly driven by sheriff vacating by April 2027 and courthouse construction start"
+    ],
+    sources: [
+      { label: "CEQA NOP — Demolition Scope", url: "https://ceqanet.lci.ca.gov/2025111159" },
+      { label: "KMPH — Courthouse Forces Sheriff Relocation", url: "https://kmph.com/news/local/proposed-750m-fresno-courthouse-could-force-sheriffs-office-relocation-downtown" }
+    ]
+  },
+  {
+    id: 4,
+    name: "Bridge Preventive Maintenance Program — Ongoing Bid Cycle",
+    category: "Roads/Bridges",
+    catClass: "cat-roads",
+    budget: 5000000,
+    budgetDisplay: "$3–8M/yr",
+    funding: "Road Fund / STIP / HBP",
+    status: "Active/Construction",
+    statusClass: "status-active",
+    score: 5,
+    facts: [
+      "County maintains 544 bridges — active annual maintenance and replacement cycle",
+      "Project 25-17-M Bridge Preventive Maintenance Program (Scour) currently bidding as of April 2026",
+      "Jacalitos Creek Bridge on Lost Hills Road (24-08-C) awarded May 6, 2025 to Cal Valley Construction",
+      "New bids posted Tuesdays on county PWP bid portal",
+      "County uses federal Highway Bridge Program (HBP) funding with Measure C local match for major replacements"
+    ],
+    inferences: [
+      "544-bridge inventory means recurring annual bid stream — likely 3–6 bridge projects per year at various stages",
+      "Bridge scour risk is a federal compliance issue — federal deadlines create urgency for specific projects",
+      "Heavy civil contractors (Bridgeway Civil, Cal Valley, Papich Construction noted as regular planholders) dominate this category",
+      "Subconsultant opportunities for geotechnical, structural inspection, and environmental"
+    ],
+    sources: [
+      { label: "County PWP — Construction Bidding Opportunities", url: "https://www.fresnocountyca.gov/Departments/Public-Works-and-Planning/Construction-Bidding-Opportunities" },
+      { label: "County — 24-08-C Jacalitos Creek Bridge Awarded", url: "https://www.fresnocountyca.gov/Departments/Public-Works-and-Planning/Construction-Bidding-Opportunities/24-08-C-Jacalitos-Creek-Bridge-Replacement-on-Lost-Hills-Road" }
+    ]
+  },
+  {
+    id: 5,
+    name: "Road Resurfacing &amp; Maintenance — Unincorporated County Roads",
+    category: "Roads/Bridges",
+    catClass: "cat-roads",
+    budget: 30000000,
+    budgetDisplay: "~$30M/yr",
+    funding: "Measure C / Road Fund / RMRA",
+    status: "Active/Construction",
+    statusClass: "status-active",
+    score: 4,
+    facts: [
+      "County maintains 3,555 miles of roadway in unincorporated Fresno County",
+      "Measure C Local Transportation Program distributes funds to county for road maintenance based on population/mileage",
+      "Road Maintenance and Rehabilitation Account (RMRA / SB 1) provides additional state funding",
+      "Measure C expires June 30, 2027 — current program is in final 18 months unless replaced",
+      "County estimates ~$1.6 billion in deferred road maintenance in unincorporated areas"
+    ],
+    inferences: [
+      "Rush to obligate remaining Measure C funds before June 2027 expiry likely accelerates bidding in late 2026",
+      "Multiple pavement overlay, chip seal, and crack seal contracts expected annually",
+      "Rural road access constraints limit contractors — regional firms with equipment mobilized in the Valley have advantage",
+      "If Measure C replacement passes Nov 2026, a new 20-year program kicks in — major sustained pipeline"
+    ],
+    sources: [
+      { label: "County PWP — Transportation / Road Maintenance", url: "https://www.co.fresno.ca.us/departments/public-works-planning/divisions-of-public-works-and-planning/construction-management-division/transportation" },
+      { label: "GV Wire — Measure C Dead, What's Next", url: "https://gvwire.com/2026/01/08/measure-c-dead-whats-next-for-fresno-county-transportation/" }
+    ]
+  },
+  {
+    id: 6,
+    name: "Ag Commissioner / Sealer New Building",
+    category: "County Facilities",
+    catClass: "cat-facilities",
+    budget: 20000000,
+    budgetDisplay: "~$20M est.",
+    funding: "County General Fund (multi-year appropriation)",
+    status: "Design/Procurement",
+    statusClass: "status-design",
+    score: 4,
+    facts: [
+      "$8M toward new Ag Commissioner/Sealer Building allocated in FY 2022-23 budget",
+      "$4M for design and architectural services was allocated in prior fiscal year — design work underway",
+      "CAO Nerland confirmed site outreach underway as of 2022 — process has been in motion for 3+ years",
+      "County worked with Farm Bureau and Nisei Farmers League on site input",
+      "Multi-year capital appropriation pattern suggests construction funding is being accumulated"
+    ],
+    inferences: [
+      "Facility likely serves agricultural inspection, weights and measures, and public counter operations",
+      "Multi-year funding accumulation + design work suggests construction procurement could be imminent in 2026",
+      "Site likely in agricultural/unincorporated area — civil site work, utilities, and access road component",
+      "Watch county Board agendas for construction contract award authorization"
+    ],
+    sources: [
+      { label: "Fresnoland — FY 2022-23 Budget", url: "https://fresnoland.org/2022/09/13/fresno-county-board-of-supervisors-9-12-22-2022-23-budget-of-4-45b-approved-seiu-2015-requests-higher-pay-for-workers/" },
+      { label: "County FY 2022-23 Recommended Budget", url: "https://www.fresnocountyca.gov/files/sharedassets/county/v/1/county-administrative-office/cao-budget/fy-2022-23-budget/fy-2022-23-recommended-budget.pdf" }
+    ]
+  },
+  {
+    id: 7,
+    name: "Board of Supervisors / CAO New Headquarters",
+    category: "County Facilities",
+    catClass: "cat-facilities",
+    budget: 52200000,
+    budgetDisplay: "$41.7M + $10.5M pkg.",
+    funding: "County Reserved (General Fund)",
+    status: "Planning",
+    statusClass: "status-planning",
+    score: 3,
+    facts: [
+      "$41.7M reserved for new Board/CAO headquarters building and offices",
+      "$10.5M reserved separately for new parking structure",
+      "Four site options considered at Feb. 28, 2025 board meeting: Courthouse Park footprint, L St./Tuolumne site ($56.3M), JJC campus addition, or Hall of Records remodel",
+      "L St./Tuolumne option estimated at $56.3M (3-story building + 5-level parking) or up to $129M (6-story + 14-level garage)",
+      "Supervisor Bredefeld directed staff to study new headquarters options — study ongoing"
+    ],
+    inferences: [
+      "Site selection is prerequisite to A/E procurement — watch board agendas for decision",
+      "Project scope (3 to 6 floors, significant parking) makes it a substantial A/E and GC opportunity",
+      "Timing tied to courthouse completion — if Courthouse Park site chosen, must wait for courthouse to finish (2032)",
+      "L St./Tuolumne is most independent of courthouse timing and could move soonest",
+      "Hall of Records third-floor remodel option ($50M est.) is a lower-cost alternative that could be fast-tracked"
+    ],
+    sources: [
+      { label: "Fresnoland — New HQ Options Feb 2025", url: "https://fresnoland.org/2025/02/28/new-headquarters-new-courthouse-new-parking-structure-downtown-fresno-county-considers-big-moves/" }
+    ]
+  },
+  {
+    id: 8,
+    name: "Hall of Records Improvements / Renovation",
+    category: "County Facilities",
+    catClass: "cat-facilities",
+    budget: 8000000,
+    budgetDisplay: "$8M+ (budgeted)",
+    funding: "County General Fund",
+    status: "Planning",
+    statusClass: "status-planning",
+    score: 3,
+    facts: [
+      "$8M explicitly allocated in FY 2022-23 budget for Hall of Records improvements (Board/CAO project)",
+      "$6M from this fund was raided in FY 2025-26 to balance the operating budget",
+      "Third-floor remodel option estimated at $50M — would expand board room to 188 seats",
+      "Hall of Records is the historic Art Deco county headquarters building in downtown Fresno",
+      "Sheriff administrative staff will partially relocate to O/P St. buildings — freeing Hall of Records space"
+    ],
+    inferences: [
+      "Remaining balance of original $8M allocation is significantly reduced — new appropriation likely needed",
+      "Third-floor expansion would require temporary displacement of all staff on that floor — complex phasing",
+      "Historic building may trigger SHPO/CEQA review for significant alterations",
+      "If Board chooses Hall of Records remodel over new HQ, this becomes the primary facility capital project"
+    ],
+    sources: [
+      { label: "Fresnoland — County Budget Sept 2025", url: "https://fresnoland.org/2025/09/16/fresno-county-approves-5-3-billion-budget/" },
+      { label: "Mid Valley Times — FY 2025-26 Budget", url: "https://midvalleytimes.com/article/city-council/2025/09/18/fresno-county-balances-5-3b-budget/" }
+    ]
+  },
+  {
+    id: 9,
+    name: "ARPA Water Infrastructure — Disadvantaged Communities",
+    category: "Water/Environmental",
+    catClass: "cat-water",
+    budget: 35000000,
+    budgetDisplay: "~$35M total",
+    funding: "ARPA / SLFRF",
+    status: "Active/Construction",
+    statusClass: "status-active",
+    score: 4,
+    facts: [
+      "County allocated ~$35M in ARPA toward water infrastructure in Riverdale, Malaga, Caruthers, Mendota, Raisin City, Biola and others",
+      "Largest ARPA water project: $6M Elkhorn Recharge Facility (groundwater recharge, North Fork Kings GSA) — completion expected 2027",
+      "Projects include water storage tanks, booster pump stations, meter replacement, pipeline installation",
+      "82 total ARPA programs; 28 completed as of 2025 ARPA Recovery Plan",
+      "All ARPA funds must be obligated by Dec. 31, 2026 and expended by Dec. 31, 2028 — hard federal deadlines"
+    ],
+    inferences: [
+      "Remaining unobligated ARPA water/broadband funds must be placed under contract by end of 2026 — urgency is real",
+      "Individual project sizes suggest multiple small-to-mid ($1M–$6M) civil and environmental contracts",
+      "Specialty contractors: water tank installation, pump station, trenchless pipe, SCADA/controls",
+      "Water Geology and Natural Resources section of PWP manages these — different contact than road capital"
+    ],
+    sources: [
+      { label: "Fresnoland — How Fresno Spent ARPA", url: "https://fresnoland.org/2025/01/03/arpa-funds/" },
+      { label: "US Treasury — Fresno County ARPA Recovery Plan 2025", url: "https://home.treasury.gov/system/files/136/Fresno-County-California-2025-Recovery-Plan-SLT-4029.pdf" }
+    ]
+  },
+  {
+    id: 10,
+    name: "Kearney Park Improvements (ARPA-funded)",
+    category: "Parks/Libraries",
+    catClass: "cat-parks",
+    budget: 9360000,
+    budgetDisplay: "$9.36M",
+    funding: "ARPA",
+    status: "Active/Construction",
+    statusClass: "status-active",
+    score: 4,
+    facts: [
+      "$9.36M in ARPA funds allocated for park improvements",
+      "Includes Kearney Park (historic county park) and multiple rural county parks",
+      "Additional projects: community pool in Calwa, parks in El Porvenir and Raisin City",
+      "Kearney Park is a major regional recreational asset with event venues, rose garden, and historic mansion",
+      "Park improvement ARPA spend has federal obligation deadline Dec. 31, 2026"
+    ],
+    inferences: [
+      "Kearney Park improvements likely include infrastructure upgrades — utilities, paving, accessibility, amenities",
+      "Rural park projects are small but numerous — potential for bundled bid packages",
+      "Calwa community pool may involve mechanical/aquatics systems — niche specialty work",
+      "County Resources and Parks division manages — separate from PWP Capital Projects"
+    ],
+    sources: [
+      { label: "Fresnoland — ARPA Spending", url: "https://fresnoland.org/2025/01/03/arpa-funds/" }
+    ]
+  },
+  {
+    id: 11,
+    name: "Measure C Replacement — Transportation Sales Tax Program",
+    category: "Transportation",
+    catClass: "cat-transport",
+    budget: 3900000000,
+    budgetDisplay: "$3.9B (20-yr)",
+    funding: "Sales Tax (Voter-Approved, Pending)",
+    status: "Future",
+    statusClass: "status-future",
+    score: 2,
+    facts: [
+      "Current Measure C (half-cent sales tax) expires June 30, 2027",
+      "Two competing replacement measures both filed petitions for November 2026 ballot",
+      "'Better Roads, Safe Streets' — submitted 32,000 signatures April 14, 2026, pending signature verification",
+      "'Fix Our Roads' — rival plan with 50% local road repairs, 16% highways, 16% flex, 18% transit; $3.9B over 20 years",
+      "Measure C replacement requires 50%+1 majority (signature-gathered initiatives); previous attempt failed in 2022 at 2/3 requirement",
+      "Fix Our Roads has a list of 100+ road-widening, interchange, and regional projects identified"
+    ],
+    inferences: [
+      "If either measure passes in November 2026, it activates a $3.9B+ 20-year transportation capital pipeline",
+      "Program management, early design, and program delivery contracts would follow within 12–18 months",
+      "Road contractors and A/E firms should track both campaigns and position for early programmatic engagement",
+      "Even if both measures fail, Measure C funds must be spent through June 2027 — acceleration of existing program expected"
+    ],
+    sources: [
+      { label: "Fresnoland — Measure C Ballot Race", url: "https://fresnoland.org/2026/04/14/no-plan-b-is-one-side-winning-in-the-fight-over-fresnos-transportation-tax/" },
+      { label: "GV Wire — Measure C Dead, What's Next", url: "https://gvwire.com/2026/01/08/measure-c-dead-whats-next-for-fresno-county-transportation/" }
+    ]
+  },
+  {
+    id: 12,
+    name: "Library Branch Capital Improvements",
+    category: "Parks/Libraries",
+    catClass: "cat-parks",
+    budget: 5000000,
+    budgetDisplay: "~$5M est.",
+    funding: "County General Fund / Grants",
+    status: "Planning",
+    statusClass: "status-planning",
+    score: 3,
+    facts: [
+      "Clovis Library (Org 8863) and Reedley Branch Library (Org 8865) are recurring budget line items for capital improvements",
+      "Library Capital Improvements (Org 7530) is a separate general fund capital org in the county budget",
+      "County has multiple library branches across Fresno County serving rural and suburban communities",
+      "Prior Clovis and Reedley library projects appeared in FY 2022-23 budget"
+    ],
+    inferences: [
+      "Annual appropriation pattern suggests recurring small capital work — HVAC, roofing, ADA, technology upgrades",
+      "Individual library projects typically $500K–$3M — suitable for smaller A/E and GC firms",
+      "Community Development Block Grant (CDBG) funds sometimes applied to library upgrades in low-income communities"
+    ],
+    sources: [
+      { label: "County FY 2022-23 Recommended Budget", url: "https://www.fresnocountyca.gov/files/sharedassets/county/v/1/county-administrative-office/cao-budget/fy-2022-23-budget/fy-2022-23-recommended-budget.pdf" }
+    ]
+  },
+  {
+    id: 13,
+    name: "Juvenile Justice Campus — Ongoing Facility Improvements",
+    category: "Justice/Sheriff",
+    catClass: "cat-justice",
+    budget: 10000000,
+    budgetDisplay: "~$10M est.",
+    funding: "County General Fund",
+    status: "Planning",
+    statusClass: "status-planning",
+    score: 3,
+    facts: [
+      "Juvenile Justice Campus (JJC) is a recurring county capital budget line (Org 8830)",
+      "JJC has 9,000-panel solar installation — largest solar project in county history — already operational",
+      "Probation department continuously working to maintain minimum staffing — aging facility creates needs",
+      "JJC is located approximately 8 miles from downtown, south of city — separate from courthouse/downtown cluster"
+    ],
+    inferences: [
+      "Solar infrastructure in place — next likely focus is facility modernization, HVAC, security, program spaces",
+      "One Board/CAO HQ option considered adding new building adjacent to JJC campus — watch for site selection decision",
+      "Detention facility upgrades (programming rooms, secure corridors, control systems) are specialty work",
+      "Ongoing appropriations suggest steady low-level capital spend with occasional larger packages"
+    ],
+    sources: [
+      { label: "County FY 2022-23 Recommended Budget", url: "https://www.fresnocountyca.gov/files/sharedassets/county/v/1/county-administrative-office/cao-budget/fy-2022-23-budget/fy-2022-23-recommended-budget.pdf" },
+      { label: "Fresnoland — New HQ Options", url: "https://fresnoland.org/2025/02/28/new-headquarters-new-courthouse-new-parking-structure-downtown-fresno-county-considers-big-moves/" }
+    ]
+  },
+  {
+    id: 14,
+    name: "Rural Road Access &amp; Safe Routes Projects (CDBG-funded)",
+    category: "Roads/Bridges",
+    catClass: "cat-roads",
+    budget: 3000000,
+    budgetDisplay: "$1–3M/yr",
+    funding: "CDBG / HCD",
+    status: "Active/Construction",
+    statusClass: "status-active",
+    score: 3,
+    facts: [
+      "County administers CDBG grants for unincorporated areas — 2025-26 application cycle open",
+      "Projects include roads, pipelines, public buildings, infrastructure in disadvantaged unincorporated communities",
+      "Target communities: Biola, Calwa, Caruthers, Del Rey, Laton, Malaga, Mendota, Orange Cove, Reedley, Raisin City, Riverdale, Selma, Sanger, Tranquility",
+      "County PWP Community Development Division manages CDBG capital grants",
+      "Infrastructure projects eligible: roads, sidewalks, water/sewer, public buildings, drainage"
+    ],
+    inferences: [
+      "Multiple small CDBG construction contracts annually — typically $250K–$2M",
+      "Local contractor preference in rural communities — firms familiar with San Joaquin Valley conditions",
+      "Biola sidewalks precedent suggests sidewalk/ADA retrofits are fundable — other communities likely to follow"
+    ],
+    sources: [
+      { label: "County CDBG Application 2025-26", url: "https://www.fresnocountyca.gov/files/sharedassets/county/v/1/public-works-and-planning/community-development-division/2025-2026-cdbg-app-unincorporated-areas-fill-in.pdf" }
+    ]
+  },
+  {
+    id: 15,
+    name: "On-Call Environmental Consultants — PWP Program",
+    category: "Water/Environmental",
+    catClass: "cat-water",
+    budget: 2000000,
+    budgetDisplay: "~$2M contract",
+    funding: "County PWP / Project-by-project",
+    status: "Design/Procurement",
+    statusClass: "status-design",
+    score: 4,
+    facts: [
+      "On-Call Environmental Consultants Services RFP (PWP25) closed in 2025",
+      "On-call environmental services support roads, bridges, facility, water projects across the county",
+      "Successor contract procurement likely in 2026",
+      "County PWP issues 'Notify Me' alerts for new consulting RFPs — sign-up available on county website",
+      "Past on-call environmental work has included CEQA, biological surveys, cultural resources, hydrology"
+    ],
+    inferences: [
+      "Environmental consulting on-call contract is a gateway to participation in most county capital projects",
+      "County uses on-call roster to staff environmental work on bridge replacements, road widening, and facility projects",
+      "New RFP expected 2026 — firms should be positioned with CEQA, biology, and cultural resources capability",
+      "Courthouse EIR is Judicial Council's responsibility, not county's — but county needs own environmental support for site prep and facility projects"
+    ],
+    sources: [
+      { label: "County PWP — Closed RFPs", url: "https://www.fresnocountyca.gov/Departments/Public-Works-and-Planning/Request-For-Proposals" }
+    ]
+  },
+  {
+    id: 16,
+    name: "Public Improvement Standards Update — County PWP",
+    category: "County Facilities",
+    catClass: "cat-facilities",
+    budget: 500000,
+    budgetDisplay: "~$500K est.",
+    funding: "County General Fund",
+    status: "Design/Procurement",
+    statusClass: "status-design",
+    score: 3,
+    facts: [
+      "Active RFP: County PWP soliciting firms to prepare new and updated Public Improvement Standard Plans and Specifications",
+      "Scope: new and updated improvement standards for county-maintained roadways, drainage, and related infrastructure",
+      "County has 3,555 road miles; updated standards affect all future construction projects",
+      "Standards update is a prerequisite to modernizing county road design and procurement documents"
+    ],
+    inferences: [
+      "Civil engineering/planning firms with transportation standard experience are the target",
+      "Standards update creates downstream design standard contracts as county updates plans to comply",
+      "Good relationship-building opportunity with PWP staff and leadership"
+    ],
+    sources: [
+      { label: "County PWP RFP — Improvement Standards", url: "https://www.fresnocountyca.gov/Departments/Public-Works-and-Planning/Request-For-Proposals/rfp-improvement-standards" }
+    ]
+  },
+  {
+    id: 17,
+    name: "Animal Control Facility Improvements",
+    category: "County Facilities",
+    catClass: "cat-facilities",
+    budget: 3000000,
+    budgetDisplay: "~$3M est.",
+    funding: "County General Fund",
+    status: "Planning",
+    statusClass: "status-planning",
+    score: 2,
+    facts: [
+      "Animal Control Facility (Org 8855) is a dedicated capital budget line in the county",
+      "New Animal Services facility was noted as completed in the FY 2022-23 budget narrative",
+      "Ongoing capital improvements to the facility are likely for expansion or maintenance",
+      "County animal services serves large geographic area including rural communities"
+    ],
+    inferences: [
+      "Post-completion improvements typically focus on capacity expansion, HVAC/kenneling systems, ADA",
+      "Small project scope — local specialty contractors and smaller A/E firms most competitive",
+      "Facility type requires specialized kenneling, veterinary, and animal care MEP systems"
+    ],
+    sources: [
+      { label: "County FY 2022-23 Budget", url: "https://www.fresnocountyca.gov/files/sharedassets/county/v/1/county-administrative-office/cao-budget/fy-2022-23-budget/fy-2022-23-recommended-budget.pdf" }
+    ]
+  },
+  {
+    id: 18,
+    name: "Courthouse Park Site Utility Relocation &amp; Site Prep",
+    category: "Courts/Judicial",
+    catClass: "cat-courts",
+    budget: 10000000,
+    budgetDisplay: "~$10M est.",
+    funding: "State / County (split TBD)",
+    status: "Planning",
+    statusClass: "status-planning",
+    score: 3,
+    facts: [
+      "New courthouse requires 2.09-acre cleared site at M Street and Fresno Street",
+      "Underground tunnel connecting courthouse to adjacent facilities must be preserved or relocated",
+      "Utilities serving existing Sheriff and Annex Jail buildings must be capped, relocated, or repurposed",
+      "Site preparation includes grading, demolition, utility relocation and new site access",
+      "Judicial Council CEQA NOP explicitly notes site preparation as part of project scope"
+    ],
+    inferences: [
+      "Utility relocation scope requires coordination with PG&E, City of Fresno water/sewer, and county",
+      "County is likely responsible for pre-construction site clearing even if Judicial Council funds the courthouse itself",
+      "Civil/MEP contractors with downtown Fresno utility infrastructure experience have advantage",
+      "This work must precede courthouse Design-Build start — creates a distinct early bid package"
+    ],
+    sources: [
+      { label: "CEQA NOP — Courthouse Site Prep Scope", url: "https://ceqanet.lci.ca.gov/2025111159" },
+      { label: "Judicial Council Project Page", url: "https://courts.ca.gov/facilities/fresno-county-new-fresno-courthouse" }
+    ]
+  }
+];
+
+let sortCol = 'score';
+let sortDir = 'desc';
+
+function scoreClass(s) { return `score-${s}`; }
+
+function statusClass(s) {
+  const m = {
+    'Active/Construction': 'status-active',
+    'Acquisition': 'status-acquisition',
+    'Design/Procurement': 'status-design',
+    'Planning': 'status-planning',
+    'Future': 'status-future'
+  };
+  return m[s] || 'status-future';
+}
+
+function getFilteredProjects() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const status = document.getElementById('statusFilter').value;
+  const score = document.getElementById('scoreFilter').value;
+
+  return projects.filter(p => {
+    if (search && !p.name.toLowerCase().includes(search) && !p.category.toLowerCase().includes(search) && !p.funding.toLowerCase().includes(search)) return false;
+    if (cat && p.category !== cat) return false;
+    if (status && p.status !== status) return false;
+    if (score && p.score !== parseInt(score)) return false;
+    return true;
+  });
+}
+
+function renderTable() {
+  const data = getFilteredProjects();
+
+  data.sort((a, b) => {
+    let av = a[sortCol], bv = b[sortCol];
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  if (data.length === 0) {
+    document.getElementById('noResults').style.display = 'block';
+    document.getElementById('rowCount').textContent = '0 projects';
+    return;
+  }
+
+  document.getElementById('noResults').style.display = 'none';
+  document.getElementById('rowCount').textContent = data.length + ' projects';
+
+  data.forEach(p => {
+    const row = document.createElement('tr');
+    row.id = 'row-' + p.id;
+    row.innerHTML = `
+      <td><span class="score-badge ${scoreClass(p.score)}">${p.score}</span></td>
+      <td class="project-name"><span class="expand-indicator" id="ei-${p.id}">+</span>${p.name}</td>
+      <td><span class="category-pill ${p.catClass}">${p.category}</span></td>
+      <td class="budget-cell">${p.budgetDisplay}</td>
+      <td style="font-size:12px;color:var(--text3)">${p.funding}</td>
+      <td><span class="status-pill ${statusClass(p.status)}">${p.status}</span></td>
+    `;
+    row.addEventListener('click', () => toggleDetail(p.id));
+    tbody.appendChild(row);
+
+    const detailRow = document.createElement('tr');
+    detailRow.className = 'detail-row';
+    detailRow.id = 'detail-' + p.id;
+    const factsHtml = p.facts.map(f => `<li><span class="bullet">●</span>${f}</li>`).join('');
+    const inferHtml = p.inferences.map(f => `<li class="inferred"><span class="bullet">◆</span>${f}</li>`).join('');
+    const srcHtml = p.sources.map(s => `<div><a href="${s.url}" target="_blank">↗ ${s.label}</a></div>`).join('');
+    detailRow.innerHTML = `
+      <td class="detail-cell" colspan="6">
+        <div class="detail-inner">
+          <div class="detail-section">
+            <h4><span class="tag-confirmed">CONFIRMED</span> Confirmed Facts</h4>
+            <ul>${factsHtml}</ul>
+          </div>
+          <div class="detail-section">
+            <h4><span class="tag-inferred">INFERRED</span> Inferences &amp; Implications</h4>
+            <ul>${inferHtml}</ul>
+          </div>
+          <div class="detail-section">
+            <h4>Source Documents</h4>
+            <div class="sources-list">${srcHtml}</div>
+          </div>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(detailRow);
+  });
+}
+
+function toggleDetail(id) {
+  const detailRow = document.getElementById('detail-' + id);
+  const ei = document.getElementById('ei-' + id);
+  const mainRow = document.getElementById('row-' + id);
+  const isOpen = detailRow.classList.contains('open');
+  detailRow.classList.toggle('open', !isOpen);
+  mainRow.classList.toggle('expanded', !isOpen);
+  if (ei) ei.textContent = isOpen ? '+' : '−';
+}
+
+function sortTable(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = (col === 'score' || col === 'budget') ? 'desc' : 'asc';
+  }
+  ['score','name','category','budget','funding','status'].forEach(c => {
+    const el = document.getElementById('sort-' + c);
+    if (el) {
+      el.textContent = c === sortCol ? (sortDir === 'asc' ? '▲' : '▼') : '';
+      el.className = 'sort-indicator' + (c === sortCol ? ' active' : '');
+    }
+  });
+  renderTable();
+}
+
+function applyQuickFilter(type) {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('catFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('scoreFilter').value = '';
+  document.querySelectorAll('.qf-btn').forEach(b => b.classList.remove('active'));
+  if (type === 'clear') { renderTable(); return; }
+  const clicked = event.target;
+  clicked.classList.add('active');
+  if (type === 'active') document.getElementById('statusFilter').value = 'Active/Construction';
+  else if (type === 'courts') document.getElementById('catFilter').value = 'Courts/Judicial';
+  else if (type === 'roads') document.getElementById('catFilter').value = 'Roads/Bridges';
+  else if (type === 'water') document.getElementById('catFilter').value = 'Water/Environmental';
+  else if (type === 'top') document.getElementById('scoreFilter').value = '4';
+  renderTable();
+}
+
+function exportCSV() {
+  const data = getFilteredProjects();
+  const headers = ['Score','Project Name','Category','Est. Value','Funding Source','Status'];
+  const rows = data.map(p => [
+    p.score,
+    `"${p.name.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&')}"`,
+    `"${p.category}"`,
+    `"${p.budgetDisplay}"`,
+    `"${p.funding}"`,
+    `"${p.status}"`
+  ]);
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'fresno_county_cip_opportunities.csv';
+  a.click();
+}
+
+document.getElementById('searchInput').addEventListener('input', renderTable);
+document.getElementById('catFilter').addEventListener('change', renderTable);
+document.getElementById('statusFilter').addEventListener('change', renderTable);
+document.getElementById('scoreFilter').addEventListener('change', renderTable);
+
+renderTable();
+</script>
+</body>
+</html>

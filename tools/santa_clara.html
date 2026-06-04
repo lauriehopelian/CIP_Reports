@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City of Santa Clara — Measure I Bond Intelligence Tool</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #2a3240;
+    --accent: #2563eb;
+    --accent2: #1d4ed8;
+    --gold: #f59e0b;
+    --green: #10b981;
+    --red: #ef4444;
+    --orange: #f97316;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --sc-blue: #1a3a6b;
+    --sc-gold: #c8932a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0a1628 0%, #1a3a6b 50%, #0d2244 100%);
+    border-bottom: 3px solid var(--sc-gold);
+    padding: 24px 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .agency-badge {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .agency-seal {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c8932a, #f5c842);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: #0a1628;
+    flex-shrink: 0;
+  }
+
+  .agency-name {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+
+  .agency-sub {
+    font-size: 12px;
+    color: var(--sc-gold);
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(200,147,42,0.4);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #cbd5e1;
+  }
+
+  .meta-pill span { color: var(--sc-gold); font-weight: 700; }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
+
+  /* INTEL SECTIONS */
+  .intel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .intel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+  }
+
+  .intel-card.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .intel-card h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--sc-gold);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .intel-card h3 .icon { font-size: 14px; }
+
+  .intel-body { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+  .intel-body ul { padding-left: 0; list-style: none; }
+  .intel-body ul li {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    gap: 8px;
+  }
+  .intel-body ul li:last-child { border-bottom: none; }
+  .intel-body ul li::before { content: '→'; color: var(--sc-gold); flex-shrink: 0; }
+
+  .tag-confirmed {
+    background: rgba(16,185,129,0.15);
+    border: 1px solid rgba(16,185,129,0.3);
+    color: #34d399;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .tag-inferred {
+    background: rgba(245,158,11,0.15);
+    border: 1px solid rgba(245,158,11,0.3);
+    color: #fbbf24;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .tag-watch {
+    background: rgba(249,115,22,0.15);
+    border: 1px solid rgba(249,115,22,0.3);
+    color: #fb923c;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  /* BUDGET BARS */
+  .budget-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .budget-bar-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .budget-bar-card .label {
+    font-size: 11px;
+    color: var(--text3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 4px;
+  }
+
+  .budget-bar-card .amount {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .budget-bar-card .bar-bg {
+    background: var(--border);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .budget-bar-card .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--sc-blue), var(--accent));
+  }
+
+  .budget-bar-card .sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 6px;
+  }
+
+  /* CONTROLS */
+  .controls {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .controls input[type=text] {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    width: 240px;
+  }
+
+  .controls input[type=text]:focus { outline: none; border-color: var(--accent); }
+
+  .controls select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .quick-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .qf-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .qf-btn:hover, .qf-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .table-header h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .table-header .count {
+    font-size: 12px;
+    color: var(--text3);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  .export-btns { display: flex; gap: 8px; }
+
+  .export-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .export-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    background: #0f1620;
+    color: var(--text3);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 91px;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  thead th:hover { color: var(--text); }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(42,50,64,0.5);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: rgba(37,99,235,0.06); }
+
+  tbody tr.expanded { background: rgba(37,99,235,0.08); }
+
+  td {
+    padding: 11px 14px;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  td.project-name {
+    font-weight: 600;
+    color: var(--text);
+    max-width: 280px;
+  }
+
+  td.project-name .expand-indicator {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    text-align: center;
+    line-height: 15px;
+    font-size: 10px;
+    margin-right: 8px;
+    color: var(--text3);
+    flex-shrink: 0;
+    vertical-align: middle;
+  }
+
+  .score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .score-5 { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+  .score-4 { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  .score-3 { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+  .score-2 { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+  .score-1 { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+
+  .category-pill {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  .cat-fire { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+  .cat-parks { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+  .cat-streets { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+  .cat-stormwater { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+  .cat-police { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
+  .cat-historic { background: rgba(236,72,153,0.15); color: #f472b6; border: 1px solid rgba(236,72,153,0.2); }
+  .cat-utility { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid rgba(20,184,166,0.2); }
+
+  .status-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .status-active { background: rgba(16,185,129,0.15); color: #34d399; }
+  .status-design { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .status-planning { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .status-funded { background: rgba(139,92,246,0.15); color: #a78bfa; }
+  .status-future { background: rgba(100,116,139,0.15); color: #94a3b8; }
+
+  .budget-cell { font-weight: 700; font-size: 13px; white-space: nowrap; }
+
+  /* DETAIL ROW */
+  .detail-row { display: none; }
+  .detail-row.open { display: table-row; }
+
+  .detail-cell {
+    padding: 0 !important;
+    border-bottom: 2px solid var(--accent) !important;
+  }
+
+  .detail-inner {
+    background: #111827;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+
+  .detail-section h4 {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .detail-section h4::before {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 12px;
+    background: var(--sc-gold);
+    border-radius: 2px;
+  }
+
+  .detail-section ul { list-style: none; padding: 0; }
+  .detail-section ul li {
+    font-size: 12px;
+    color: var(--text2);
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    gap: 7px;
+    align-items: flex-start;
+  }
+  .detail-section ul li:last-child { border-bottom: none; }
+  .detail-section ul li span.bullet { color: var(--sc-gold); flex-shrink: 0; font-size: 10px; margin-top: 3px; }
+
+  .detail-section ul li.inferred span.bullet { color: #fbbf24; }
+
+  .sources-list { font-size: 11px; color: var(--text3); }
+  .sources-list a { color: var(--accent); text-decoration: none; }
+  .sources-list a:hover { text-decoration: underline; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text3);
+    font-size: 11px;
+    border-top: 1px solid var(--border);
+    margin-top: 32px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .detail-inner { grid-template-columns: 1fr; }
+    .intel-grid { grid-template-columns: 1fr; }
+    .budget-overview { grid-template-columns: 1fr 1fr; }
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 40px;
+    color: var(--text3);
+    font-size: 14px;
+  }
+
+  .sort-indicator { margin-left: 4px; opacity: 0.5; }
+  .sort-indicator.active { opacity: 1; color: var(--sc-gold); }
+
+  .phase-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(200,147,42,0.15);
+    border: 1px solid rgba(200,147,42,0.3);
+    color: var(--sc-gold);
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="agency-badge">
+      <div class="agency-seal">SC</div>
+      <div>
+        <div class="agency-name">City of Santa Clara</div>
+        <div class="agency-sub">Measure I — $400M Infrastructure Bond · Intelligence Tool</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-pill">Bond Approved: <span>Nov. 5, 2024</span></div>
+      <div class="meta-pill">Phase 1 Allocated: <span>~$100M (Sep 2025)</span></div>
+      <div class="meta-pill">Total Deficit: <span>$624M+</span></div>
+      <div class="meta-pill">Term: <span>30 Years</span></div>
+      <div class="meta-pill">Updated: <span>April 2026</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- BUDGET OVERVIEW BARS -->
+  <div class="budget-overview">
+    <div class="budget-bar-card">
+      <div class="label">Fire Stations &amp; Emergency Response</div>
+      <div class="amount">$142.2M</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:35.6%"></div></div>
+      <div class="sub">35.6% of bond · Stations 5, 7 + others</div>
+    </div>
+    <div class="budget-bar-card">
+      <div class="label">Parks, Libraries, Senior Center &amp; Aquatics</div>
+      <div class="amount">$115.3M</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:28.8%"></div></div>
+      <div class="sub">28.8% of bond · ISC, libraries, parks</div>
+    </div>
+    <div class="budget-bar-card">
+      <div class="label">Police Facilities</div>
+      <div class="amount">$44.0M</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:11.0%"></div></div>
+      <div class="sub">11.0% of bond · Training, EOC, crime center</div>
+    </div>
+    <div class="budget-bar-card">
+      <div class="label">Stormwater &amp; Drain Improvements</div>
+      <div class="amount">$46.0M</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:11.5%"></div></div>
+      <div class="sub">11.5% of bond · Drains, retention basins</div>
+    </div>
+    <div class="budget-bar-card">
+      <div class="label">Streets &amp; Transportation</div>
+      <div class="amount">$41.2M</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:10.3%"></div></div>
+      <div class="sub">10.3% of bond · Resurfacing, ADA, Vision Zero</div>
+    </div>
+    <div class="budget-bar-card">
+      <div class="label">Historic Buildings &amp; Beautification</div>
+      <div class="amount">$9.2M</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:2.3%"></div></div>
+      <div class="sub">2.3% of bond · Median beautification, historic buildings</div>
+    </div>
+  </div>
+
+  <!-- INTEL SECTIONS -->
+  <div class="intel-grid">
+
+    <div class="intel-card">
+      <h3><span class="icon">🎯</span> Clearest Near-Term Paths (Phase 1 Active)</h3>
+      <div class="intel-body">
+        <ul>
+          <li>George F. Haines International Swim Center — $22.2M Phase 1 allocated Sept 2025. Pool decks, dive tower, recirculation plumbing, boilers, admin building demolition. Construction target Feb 2026. High-profile, politically charged. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Fire Station 5 Replacement — ~$12M allocated Phase 1 (of $27M total). Too small for modern engines; exits must be reconfigured to Bowers Ave. Station rebuild imminent. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Fire Station 7 Replacement — $27M total allocated alongside FS5. Part of Phase 1 activation. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Street Resurfacing / Rehab — $16M Phase 1 allocated. Four separate street projects including ADA upgrades citywide. Active procurement likely 2026. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Storm Drain Phase 1 — $16.6M allocated Sep 2025. Councilmember Hardy flagged sewage failure risk as urgent. Fast-track procurement expected. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Henry Schmidt Park Playground Renovation — $4.3M Phase 1. Active. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Accessibility Improvements Citywide — $5M Phase 1. ADA compliance upgrades at multiple facilities. <span class="tag-confirmed">CONFIRMED</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intel-card">
+      <h3><span class="icon">🔭</span> Intelligence &amp; Inferences</h3>
+      <div class="intel-body">
+        <ul>
+          <li>Bond money must be spent within 3 years of issuance (or 5 years with engineer certification) — strong urgency signal for all Phase 1 projects to go to bid in 2026. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Bond was sold at ~$100M Phase 1; remaining ~$300M to follow in additional issuances over 30-year term. Future phases not yet scheduled. <span class="tag-inferred">INFERRED</span></li>
+          <li>FS5 reconfiguration to Bowers Ave exit creates civil/site work opportunity separate from structural rebuild. <span class="tag-inferred">INFERRED</span></li>
+          <li>SVP approved $983M battery storage contract (20 years, NCPA). Data center load growth driving capacity expansion — SVP capital projects pipeline expanding. Not bond-funded but a parallel major program. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Vision Zero adopted March 11, 2026. High-injury corridors: Monroe St (Lawrence to Bowers), El Camino Real (Halford to Scott). Intersection redesign, crosswalks, traffic calming funded partly through streets allocation. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Bond Compliance Oversight Committee (BCOC) seated May 2025. Meets 3–4x/year. Committee reports will signal project progression and potential scope changes. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Swim center advocacy community (Santa Clara Swim Club) wants CRC-integrated gym/community spaces — scope likely to expand beyond initial $22M. <span class="tag-inferred">INFERRED</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intel-card">
+      <h3><span class="icon">⚠️</span> Structural Constraints &amp; Red Flags</h3>
+      <div class="intel-body">
+        <ul>
+          <li>Bond covers only ~64% of $624M deficit — city will still face unfunded needs after bond is spent. Future bond likely. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Levi's Stadium exclusion zone (.5-mile radius) for bond proceeds — projects in that footprint ineligible except residential neighborhoods. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Expenditure Plan amendments require BCOC review + Council approval — scope changes are possible but slow. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>Council Member Kevin Park flagged concern that bond won't close full deficit — political pressure for additional revenue solutions. <span class="tag-confirmed">CONFIRMED</span></li>
+          <li>City had only $24M in Capital Projects Reserve vs $270M in requests in 2024 — prior starvation of general fund capital means design documents and pre-construction work may be thin. Expect significant A&E spend upfront. <span class="tag-inferred">INFERRED</span></li>
+          <li>Fire Department has 1 station currently in design phase (per scfd website, Apr 2026) — confirms design-phase work is in motion separately from bond replacements. <span class="tag-confirmed">CONFIRMED</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intel-card">
+      <h3><span class="icon">🏢</span> Best Targets by Firm Type</h3>
+      <div class="intel-body">
+        <ul>
+          <li><strong style="color:var(--text)">Architecture / Structural Engineering</strong> — Fire Stations 5 &amp; 7 rebuilds (complex site reconfiguration), International Swim Center redesign and expansion, library renovations (3 branches), Senior Center expansion.</li>
+          <li><strong style="color:var(--text)">Civil / Site / Geotechnical</strong> — Street resurfacing program ($41M total), storm drain rehabilitation ($46M), ADA citywide upgrades, FS5 Bowers Ave driveway reconfiguration, swim center site work.</li>
+          <li><strong style="color:var(--text)">MEP / Specialty Systems</strong> — ISC pool mechanical (recirculation, HVAC, boilers), fire station emergency systems, real-time crime center infrastructure, police training facility upgrades.</li>
+          <li><strong style="color:var(--text)">General Contractors / CM</strong> — All six categories will generate GC/CM bids; fire stations and aquatics are biggest single-project opportunities; storm drain is highest aggregate volume.</li>
+          <li><strong style="color:var(--text)">Program / Construction Management</strong> — City has thin internal capital delivery capacity (only $24M/year prior run rate). High probability of CM-at-risk or owner's rep contracts for multi-phase bond management.</li>
+          <li><strong style="color:var(--text)">A&amp;E / Environmental</strong> — Historic building renovations ($9.2M), Vision Zero corridor redesigns (Monroe St, El Camino Real), park/playground renovations across multiple sites.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intel-card">
+      <h3><span class="icon">🚦</span> Watchlist Triggers</h3>
+      <div class="intel-body">
+        <ul>
+          <li>BCOC meeting agendas (3–4x/year) — any new project list additions or Expenditure Plan amendment proposals signal Phase 2 prep.</li>
+          <li>City Council agenda items referencing "Measure I" — bond issuance Phase 2 authorization will unlock next $100M+ tranche.</li>
+          <li>Santa Clara bid postings on PlanetBids / City procurement portal — first ISC and fire station bids expected 2026.</li>
+          <li>SVP capital program — battery storage, renewable portfolio, and data center load growth driving independent utility capital program separate from Measure I.</li>
+          <li>Vision Zero implementation plan — high-injury corridor projects (Monroe St, El Camino Real) moving from policy to design/build phase in 2026–2027.</li>
+          <li>Water Supply Master Plan Update (West Yost contract $1.16M) — will drive City water utility CIP capital needs independent of Measure I.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intel-card">
+      <h3><span class="icon">📚</span> How to Read the Scoring (1–5 Rubric)</h3>
+      <div class="intel-body">
+        <ul>
+          <li><strong style="color:#34d399">5 — Highest Confidence:</strong> Explicitly funded in Phase 1, council-allocated, under active project development with defined scope and budget. Near-term bid likely.</li>
+          <li><strong style="color:#60a5fa">4 — High Confidence:</strong> Fully funded in Expenditure Plan, Phase 2+ but clearly scoped. Strong political will and confirmed need.</li>
+          <li><strong style="color:#fbbf24">3 — Medium Confidence:</strong> In Expenditure Plan but scope/delivery timeline still forming. No active procurement signals yet.</li>
+          <li><strong style="color:#fb923c">2 — Lower Confidence:</strong> In plan but dependent on future phases, political dynamics, or scope still unclear. Monitor.</li>
+          <li><strong style="color:#f87171">1 — Watch/Uncertain:</strong> Related program, non-bond funded, or highly contingent. Worth tracking but not pursuing now.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TABLE CONTROLS -->
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="🔍  Search projects...">
+    <select id="catFilter">
+      <option value="">All Categories</option>
+      <option value="Fire/Emergency">Fire / Emergency Response</option>
+      <option value="Parks/Aquatics">Parks, Libraries &amp; Aquatics</option>
+      <option value="Streets/Transportation">Streets &amp; Transportation</option>
+      <option value="Stormwater">Stormwater</option>
+      <option value="Police">Police Facilities</option>
+      <option value="Historic/Beautification">Historic / Beautification</option>
+      <option value="Utility/SVP">Utility / SVP (Non-Bond)</option>
+    </select>
+    <select id="statusFilter">
+      <option value="">All Status</option>
+      <option value="Active/Construction">Active / Construction</option>
+      <option value="Phase 1 Funded">Phase 1 Funded</option>
+      <option value="Design">Design</option>
+      <option value="Planning">Planning</option>
+      <option value="Future Phase">Future Phase</option>
+    </select>
+    <select id="scoreFilter">
+      <option value="">All Scores</option>
+      <option value="5">Score 5</option>
+      <option value="4">Score 4</option>
+      <option value="3">Score 3</option>
+      <option value="2">Score 2</option>
+    </select>
+    <div class="quick-filters">
+      <button class="qf-btn" onclick="applyQuickFilter('phase1')">Phase 1 Active</button>
+      <button class="qf-btn" onclick="applyQuickFilter('fire')">Fire Stations</button>
+      <button class="qf-btn" onclick="applyQuickFilter('aquatics')">Aquatics</button>
+      <button class="qf-btn" onclick="applyQuickFilter('streets')">Streets</button>
+      <button class="qf-btn" onclick="applyQuickFilter('top')">Score 4–5 Only</button>
+      <button class="qf-btn" onclick="applyQuickFilter('clear')">Clear All</button>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <h2>Project Opportunity Inventory</h2>
+      <div style="display:flex;gap:12px;align-items:center">
+        <span class="count" id="rowCount">— projects</span>
+        <div class="export-btns">
+          <button class="export-btn" onclick="exportCSV()">⬇ CSV</button>
+          <button class="export-btn" onclick="window.print()">🖨 Print</button>
+        </div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+    <table id="projectTable">
+      <thead>
+        <tr>
+          <th onclick="sortTable('score')">Score <span class="sort-indicator" id="sort-score">▼</span></th>
+          <th onclick="sortTable('name')">Project Name <span class="sort-indicator" id="sort-name"></span></th>
+          <th onclick="sortTable('category')">Category <span class="sort-indicator" id="sort-category"></span></th>
+          <th onclick="sortTable('budget')">Budget <span class="sort-indicator" id="sort-budget"></span></th>
+          <th onclick="sortTable('phase')">Phase <span class="sort-indicator" id="sort-phase"></span></th>
+          <th onclick="sortTable('status')">Status <span class="sort-indicator" id="sort-status"></span></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    </div>
+    <div class="no-results" id="noResults" style="display:none">No projects match your filters.</div>
+  </div>
+
+</div>
+
+<footer>
+  City of Santa Clara · Measure I Infrastructure General Obligation Bond · $400M Approved Nov. 2024<br>
+  Sources: City of Santa Clara official website, San José Spotlight (Sep 2025), Silicon Valley Voice, California Choices, City press releases<br>
+  Tool generated April 2026 · For internal business development use only
+</footer>
+
+<script>
+const projects = [
+  {
+    id: 1,
+    name: "George F. Haines International Swim Center — Phase 1 Repairs",
+    category: "Parks/Aquatics",
+    catClass: "cat-parks",
+    budget: 22200000,
+    budgetDisplay: "$22.2M",
+    phase: "Phase 1",
+    status: "Active/Construction",
+    statusClass: "status-active",
+    score: 5,
+    facts: [
+      "Phase 1 allocation of $22.2M approved by Council unanimously Sept. 16, 2025",
+      "Construction start targeted February 2026",
+      "ISC closed in January 2024 due to safety concerns — community pressure high",
+      "Phase 1 scope: pool decks, dive tower, recirculation plumbing, boilers, demolish admin building",
+      "Santa Clara Swim Club has advocated for CRC-integrated new facility for years"
+    ],
+    inferences: [
+      "Scope likely to expand in future phases toward full replacement/new facility (~$45M total in bond)",
+      "Swim club wants gym and communal spaces — A/E teams should plan for programming study",
+      "Political profile is very high — project will face public scrutiny and media coverage",
+      "Procurement likely CM-at-risk or design-build given complexity and speed pressure"
+    ],
+    sources: [
+      { label: "San José Spotlight — Sept 2025 Phase 1 Allocation", url: "https://sanjosespotlight.com/heres-how-much-santa-clara-is-spending-on-city-repairs/" },
+      { label: "City of Santa Clara — Measure I Bond Page", url: "https://www.santaclaraca.gov/i-want-to/stay-informed/current-city-projects-initiatives" }
+    ]
+  },
+  {
+    id: 2,
+    name: "Fire Station 5 — Full Replacement",
+    category: "Fire/Emergency",
+    catClass: "cat-fire",
+    budget: 27000000,
+    budgetDisplay: "$27.0M",
+    phase: "Phase 1",
+    status: "Phase 1 Funded",
+    statusClass: "status-funded",
+    score: 5,
+    facts: [
+      "~$12.2M allocated Phase 1 (of $27M total Expenditure Plan allocation for FS5 replacement)",
+      "Garage too small for modern fire engines — functional failure, not just aging",
+      "Exit must be reconfigured to Bowers Ave from residential Mark Ave — site complexity",
+      "Councilmember Hardy has personally flagged FS5 as urgent priority",
+      "Phase 1 allocation confirmed Sept. 16, 2025 council vote"
+    ],
+    inferences: [
+      "Bowers Ave reconfiguration = separate civil/site package from structural rebuild — two bid opportunities",
+      "Modern apparatus size requirements will drive large footprint and seismic upgrades",
+      "Likely design-build or design-bid-build with A/E firm contracted in 2026",
+      "May require temporary station accommodations during construction"
+    ],
+    sources: [
+      { label: "San José Spotlight — Fire Station 5 detail", url: "https://sanjosespotlight.com/heres-how-much-santa-clara-is-spending-on-city-repairs/" },
+      { label: "City Press Release — Measure I Expenditure Plan", url: "https://www.santaclaraca.gov/Home/Components/News/News/45030/3171" }
+    ]
+  },
+  {
+    id: 3,
+    name: "Fire Station 7 — Full Replacement",
+    category: "Fire/Emergency",
+    catClass: "cat-fire",
+    budget: 27000000,
+    budgetDisplay: "$27.0M",
+    phase: "Phase 1",
+    status: "Phase 1 Funded",
+    statusClass: "status-funded",
+    score: 5,
+    facts: [
+      "$27M total in Expenditure Plan for FS7 replacement",
+      "Part of Phase 1 activation alongside FS5",
+      "Some fire stations are 55+ years old and need seismic upgrades per bond ballot language",
+      "City currently has 9 stations with 1 more in design phase (per SCFD website)"
+    ],
+    inferences: [
+      "FS5 and FS7 may be procured together as a package — watch for combined A/E or CM RFP",
+      "Could be bundled with seismic retrofit requirements under DSA or OSHPD-like review",
+      "Remaining ~$88M in fire/emergency budget will cover other stations and training facility in later phases"
+    ],
+    sources: [
+      { label: "San José Spotlight Nov 2024 — bond fire allocation", url: "https://sanjosespotlight.com/santa-clara-voters-approve-multimillion-dollar-infrastructure-bond-measure-i-election-2024/" },
+      { label: "SCFD Website", url: "https://www.joinscfd.org/about-scfd" }
+    ]
+  },
+  {
+    id: 4,
+    name: "Street Resurfacing &amp; Rehabilitation — Phase 1",
+    category: "Streets/Transportation",
+    catClass: "cat-streets",
+    budget: 16000000,
+    budgetDisplay: "$16.0M",
+    phase: "Phase 1",
+    status: "Phase 1 Funded",
+    statusClass: "status-funded",
+    score: 5,
+    facts: [
+      "$16M allocated Phase 1 for road resurfacing and rehabilitation",
+      "Four separate street projects in Phase 1 per Silicon Valley Voice",
+      "Total streets/transportation bond allocation: $41.2M over full bond life",
+      "Street resurfacing is typically fastest-to-bid category in municipal bonds",
+      "Vision Zero plan adopted March 2026 — high-injury corridors identified for prioritization"
+    ],
+    inferences: [
+      "ADA overlay work will be bundled with most resurfacing packages",
+      "High-injury corridors (Monroe St: Lawrence to Bowers; El Camino Real: Halford to Scott) likely prioritized for early bids",
+      "Expect multiple small-to-mid resurfacing contracts plus at least 1 larger corridor project",
+      "IFB (competitive bid) format typical — price competition high, margins tight"
+    ],
+    sources: [
+      { label: "SVVoice — Phase 1 Street Projects", url: "https://www.svvoice.com/city-approves-first-round-of-bond-measure-projects/" },
+      { label: "SJ Spotlight — Vision Zero adopted March 2026", url: "https://sanjosespotlight.com/santa-clara-adopts-vision-zero-plan-after-late-night-council-vote/" }
+    ]
+  },
+  {
+    id: 5,
+    name: "Storm Drain Rehabilitation — Phase 1",
+    category: "Stormwater",
+    catClass: "cat-stormwater",
+    budget: 16600000,
+    budgetDisplay: "$16.6M",
+    phase: "Phase 1",
+    status: "Phase 1 Funded",
+    statusClass: "status-funded",
+    score: 5,
+    facts: [
+      "$16.6M allocated Phase 1 for storm drain updates (Sept. 2025 council vote)",
+      "Total stormwater bond allocation: $46M including retention basin remediation",
+      "Councilmember Hardy cited sewage failure risk as urgent priority",
+      "Prior unfunded needs included underground pipe erosion and sinkholes"
+    ],
+    inferences: [
+      "Phase 1 $16.6M likely prioritizes highest-risk drain segments — CCTV inspection likely already underway",
+      "Retention basin work may be separate procurement from linear drain pipe work",
+      "Could involve specialty trenchless technology / pipe lining firms",
+      "City's engineering capacity thin — likely to need construction management support"
+    ],
+    sources: [
+      { label: "SJ Spotlight — Phase 1 Allocation Sept 2025", url: "https://sanjosespotlight.com/heres-how-much-santa-clara-is-spending-on-city-repairs/" }
+    ]
+  },
+  {
+    id: 6,
+    name: "Henry Schmidt Park Playground Renovation",
+    category: "Parks/Aquatics",
+    catClass: "cat-parks",
+    budget: 4300000,
+    budgetDisplay: "$4.3M",
+    phase: "Phase 1",
+    status: "Phase 1 Funded",
+    statusClass: "status-funded",
+    score: 4,
+    facts: [
+      "$4.3M explicitly allocated in Phase 1 (Sept. 2025 council vote)",
+      "Named project — clear scope: playground renovation at Henry Schmidt Park",
+      "Part of broader parks renovation category ($115.3M total)"
+    ],
+    inferences: [
+      "Likely includes ADA play surface, new equipment, possible shade structures",
+      "Design-bid-build format expected; smaller project may attract local contractors",
+      "Could be bundled with other park/playground renovations in Phase 2"
+    ],
+    sources: [
+      { label: "SJ Spotlight — Phase 1 detail", url: "https://sanjosespotlight.com/heres-how-much-santa-clara-is-spending-on-city-repairs/" }
+    ]
+  },
+  {
+    id: 7,
+    name: "Accessibility Improvements — Citywide ADA Upgrades",
+    category: "Streets/Transportation",
+    catClass: "cat-streets",
+    budget: 5000000,
+    budgetDisplay: "$5.0M",
+    phase: "Phase 1",
+    status: "Phase 1 Funded",
+    statusClass: "status-funded",
+    score: 4,
+    facts: [
+      "$5M in accessibility improvements allocated Phase 1",
+      "Citywide scope — curb ramps, sidewalk repairs, ADA-compliant crossings",
+      "Often bundled with street resurfacing projects"
+    ],
+    inferences: [
+      "May be bid as standalone accessible routes program or bundled with street overlay contracts",
+      "Vision Zero plan creates additional design requirements at high-injury intersections"
+    ],
+    sources: [
+      { label: "SJ Spotlight — Phase 1 detail", url: "https://sanjosespotlight.com/heres-how-much-santa-clara-is-spending-on-city-repairs/" }
+    ]
+  },
+  {
+    id: 8,
+    name: "Fire Station Training Facility Renovation",
+    category: "Fire/Emergency",
+    catClass: "cat-fire",
+    budget: 15000000,
+    budgetDisplay: "~$15M est.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "Included in Fire Stations & Emergency Response category ($142.2M total)",
+      "Bond language specifies 'training facility renovation' as explicit project type",
+      "Phase 1 focused on FS5/FS7 replacement — training facility likely Phase 2",
+      "SCFD has 173.5 employees including 137 field operations — training demand is high"
+    ],
+    inferences: [
+      "Budget estimate derived from total category minus FS5+FS7 and other stations — rough estimate only",
+      "Could involve live fire props, driver training, technical rescue simulation",
+      "May be co-located with or near existing stations — site not yet identified publicly"
+    ],
+    sources: [
+      { label: "City press release — Expenditure Plan", url: "https://www.santaclaraca.gov/Home/Components/News/News/45030/3171" }
+    ]
+  },
+  {
+    id: 9,
+    name: "Remaining Fire Station Replacements / Renovations (Phase 2+)",
+    category: "Fire/Emergency",
+    catClass: "cat-fire",
+    budget: 73235450,
+    budgetDisplay: "~$73.2M rem.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "$142.2M total fire allocation minus Phase 1 FS5/7 (~$12M initial) leaves substantial future work",
+      "City has 9 fire stations, some 55+ years old",
+      "Seismic upgrades explicitly cited in bond ballot language",
+      "1 station currently in design phase per SCFD website (Apr 2026)"
+    ],
+    inferences: [
+      "Multiple future stations will require full rebuild vs renovation — scope TBD by condition assessments",
+      "Phase 2 bond issuance required before additional fire station contracts can proceed",
+      "A/E firms with fire station experience should build relationship with city Public Works NOW"
+    ],
+    sources: [
+      { label: "SCFD About Page", url: "https://www.joinscfd.org/about-scfd" },
+      { label: "Bond ballot language", url: "https://www.santaclaraca.gov/i-want-to/stay-informed/current-city-projects-initiatives/november-2024-local-bond-measure" }
+    ]
+  },
+  {
+    id: 10,
+    name: "Library Renovations &amp; Expansion — 3 Branches",
+    category: "Parks/Aquatics",
+    catClass: "cat-parks",
+    budget: 20000000,
+    budgetDisplay: "~$20M est.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "Expenditure Plan explicitly calls for 'renovation and expansion of all three libraries'",
+      "Three library branches: Central Park Library, Northside Branch, Mission Branch",
+      "Central Park Library remained open through holiday closures — high community value",
+      "Part of $115.3M Parks/Libraries/Aquatics category"
+    ],
+    inferences: [
+      "Budget estimate is rough — likely split across 3 projects of $5M–$10M each",
+      "Central Park Library expansion may be largest and most complex",
+      "Design likely requires community engagement — long lead time before construction",
+      "Potential ADA, seismic, technology/AV upgrade scope on top of space expansion"
+    ],
+    sources: [
+      { label: "Bond Expenditure Plan language", url: "https://www.santaclaraca.gov/Home/Components/News/News/45030/3171" }
+    ]
+  },
+  {
+    id: 11,
+    name: "Senior Center Renovation &amp; Expansion",
+    category: "Parks/Aquatics",
+    catClass: "cat-parks",
+    budget: 15000000,
+    budgetDisplay: "~$15M est.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "Explicitly named in Expenditure Plan: 'renovation and expansion of Senior Center'",
+      "Part of $115.3M Parks/Libraries/Aquatics category",
+      "Demographics: Santa Clara has aging-in-place population growth"
+    ],
+    inferences: [
+      "Scope likely includes HVAC, ADA, programming spaces, kitchen/dining renovation",
+      "Community meetings required before scope finalization",
+      "Potentially bundled with nearby park improvements"
+    ],
+    sources: [
+      { label: "Bond ballot language", url: "https://www.santaclaraca.gov/Home/Components/News/News/45030/3171" }
+    ]
+  },
+  {
+    id: 12,
+    name: "International Swim Center — Full Replacement / Phase 2+",
+    category: "Parks/Aquatics",
+    catClass: "cat-parks",
+    budget: 22800000,
+    budgetDisplay: "~$22.8M rem.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "$45M total bond allocation for aquatics/pools minus Phase 1 $22.2M = ~$22.8M remaining",
+      "Swim Club president publicly called for CRC-integrated new facility with gym and communal spaces",
+      "ISC was estimated at $90M for full replacement in earlier unfunded plans — current bond only partially funds",
+      "ISC community is highly organized and politically active"
+    ],
+    inferences: [
+      "Future phases likely unlock design for new/expanded aquatics center vs piecemeal repair",
+      "Additional funding sources (grants, philanthropic) may be pursued to close the gap",
+      "Long planning horizon — design competition or design-build likely preferred delivery"
+    ],
+    sources: [
+      { label: "SJ Spotlight — swim center detail", url: "https://sanjosespotlight.com/heres-how-much-santa-clara-is-spending-on-city-repairs/" }
+    ]
+  },
+  {
+    id: 13,
+    name: "Park &amp; Playground Renovations — Multiple Sites",
+    category: "Parks/Aquatics",
+    catClass: "cat-parks",
+    budget: 15000000,
+    budgetDisplay: "~$15M est.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "Bond language: 'renovation of park/playground facilities' — multiple sites expected",
+      "Henry Schmidt Park already in Phase 1 ($4.3M) — others will follow",
+      "Parks category total $115.3M supports substantial multi-site park program"
+    ],
+    inferences: [
+      "City likely to bundle 3–6 playground renovations per bid package to achieve economies of scale",
+      "Inclusive play equipment, shade, ADA surfacing standard inclusions",
+      "Priorities will be shaped by deferred maintenance assessments already completed"
+    ],
+    sources: [
+      { label: "Bond Expenditure Plan", url: "https://www.santaclaraca.gov/Home/Components/News/News/45030/3171" }
+    ]
+  },
+  {
+    id: 14,
+    name: "Police Training Facility",
+    category: "Police",
+    catClass: "cat-police",
+    budget: 20000000,
+    budgetDisplay: "~$20M est.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "$43.99M total police facilities allocation",
+      "Bond language: training facility, Police Department facility, real-time crime center infrastructure",
+      "Real-time crime center is emerging technology-integrated facility type"
+    ],
+    inferences: [
+      "Training facility may include firing range, scenario training, vehicle pursuit simulator",
+      "Real-time crime center requires specialized AV/IT integration — specialty contractor scope",
+      "Police facilities are politically sensitive in current environment — expect community engagement requirements"
+    ],
+    sources: [
+      { label: "Bond Expenditure Plan", url: "https://www.santaclaraca.gov/Home/Components/News/News/45030/3171" }
+    ]
+  },
+  {
+    id: 15,
+    name: "Police Department Facility Improvements",
+    category: "Police",
+    catClass: "cat-police",
+    budget: 15000000,
+    budgetDisplay: "~$15M est.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "Named in Expenditure Plan as 'Police Department facility'",
+      "Part of $43.99M police facilities category",
+      "City Manager Jovan Grogan cited upgrade to 911 emergency response as bond priority"
+    ],
+    inferences: [
+      "Likely includes evidence storage, detention, dispatch improvements",
+      "Emergency Operations Center upgrade possibly bundled — or separate project"
+    ],
+    sources: [
+      { label: "Bond language", url: "https://www.santaclaraca.gov/Home/Components/News/News/45030/3171" }
+    ]
+  },
+  {
+    id: 16,
+    name: "Real-Time Crime Center Infrastructure",
+    category: "Police",
+    catClass: "cat-police",
+    budget: 8987500,
+    budgetDisplay: "~$9.0M est.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "Explicitly named in bond Expenditure Plan",
+      "Real-time crime centers integrate surveillance cameras, license plate readers, gunshot detection, facial recognition",
+      "Growing category in California municipal law enforcement capital"
+    ],
+    inferences: [
+      "High specialty IT/AV integration requirement — different supply chain than typical public works",
+      "Privacy policy and civil liberties community may slow procurement — watch public comment process",
+      "Could be structured as technology systems contract rather than construction"
+    ],
+    sources: [
+      { label: "Bond Expenditure Plan", url: "https://www.santaclaraca.gov/Home/Components/News/News/45030/3171" }
+    ]
+  },
+  {
+    id: 17,
+    name: "Storm Drain Improvements — Phase 2+ (Remaining)",
+    category: "Stormwater",
+    catClass: "cat-stormwater",
+    budget: 29400000,
+    budgetDisplay: "~$29.4M rem.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "$46M total stormwater allocation minus $16.6M Phase 1 = ~$29.4M remaining",
+      "Scope includes stormwater retention basin remediation as well as underground pipe replacement",
+      "Councilmember Hardy has made stormdrains a signature issue"
+    ],
+    inferences: [
+      "Phase 2 storm drain work will depend on condition assessments from Phase 1 CCTV surveys",
+      "Basin remediation is separate specialty work from linear pipe replacement",
+      "Could involve environmental regulatory compliance requirements"
+    ],
+    sources: [
+      { label: "Bond Expenditure Plan", url: "https://www.santaclaraca.gov/Home/Components/News/News/45030/3171" }
+    ]
+  },
+  {
+    id: 18,
+    name: "Streets &amp; Transportation — Phase 2+ Remaining",
+    category: "Streets/Transportation",
+    catClass: "cat-streets",
+    budget: 20170000,
+    budgetDisplay: "~$20.2M rem.",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 3,
+    facts: [
+      "$41.2M total streets allocation minus Phase 1 $21M (approx) = ~$20M remaining",
+      "Vision Zero high-injury corridors (Monroe St, El Camino Real) will drive future street projects",
+      "City adopted Vision Zero plan March 2026 — implementation now authorized"
+    ],
+    inferences: [
+      "Vision Zero corridor projects likely bundled with Signal timing, crosswalk, and lighting upgrades",
+      "Safe Routes to School improvements may be embedded in future street packages",
+      "Grant funding (Federal SS4A) may supplement bond dollars on Vision Zero projects"
+    ],
+    sources: [
+      { label: "Vision Zero adopted March 2026 — SJ Spotlight", url: "https://sanjosespotlight.com/santa-clara-adopts-vision-zero-plan-after-late-night-council-vote/" }
+    ]
+  },
+  {
+    id: 19,
+    name: "Historic Buildings Renovation &amp; Beautification",
+    category: "Historic/Beautification",
+    catClass: "cat-historic",
+    budget: 9200000,
+    budgetDisplay: "$9.2M",
+    phase: "Phase 2+",
+    status: "Future Phase",
+    statusClass: "status-future",
+    score: 2,
+    facts: [
+      "$9.2M total allocation for historic buildings and beautification",
+      "Scope: street/median beautification and renovations to historic buildings",
+      "Smallest bond category; likely lowest procurement urgency"
+    ],
+    inferences: [
+      "Historic buildings may require CEQA and State Historic Preservation Office consultation — long lead",
+      "Median beautification packages are typically smaller IFB contracts bundled by district",
+      "May attract specialty landscape architecture and historic preservation A/E firms"
+    ],
+    sources: [
+      { label: "Bond Expenditure Plan", url: "https://www.santaclaraca.gov/Home/Components/News/News/45030/3171" }
+    ]
+  },
+  {
+    id: 20,
+    name: "Silicon Valley Power — Battery Storage Program (NCPA)",
+    category: "Utility/SVP",
+    catClass: "cat-utility",
+    budget: 983000000,
+    budgetDisplay: "$983.0M",
+    phase: "Non-Bond",
+    status: "Active/Construction",
+    statusClass: "status-active",
+    score: 2,
+    facts: [
+      "$983M, 20-year contract with Northern California Power Agency (NCPA) for battery storage approved Sept. 2025",
+      "City's load growth driven by data center expansion — capacity spike projected for 2029",
+      "Contracts with Trolley Pass Project LLC for energy storage products",
+      "Allows SVP to charge when energy costs low and discharge when costs high"
+    ],
+    inferences: [
+      "SVP capital program is significant independently of Measure I — watch SVP CIP for construction opportunities",
+      "Data center interconnections and distribution infrastructure upgrades likely follow",
+      "Not bond-funded; SVP is enterprise-funded utility — different procurement vehicle"
+    ],
+    sources: [
+      { label: "SVVoice — SVP battery storage contract", url: "https://www.svvoice.com/city-approves-first-round-of-bond-measure-projects/" }
+    ]
+  },
+  {
+    id: 21,
+    name: "Water Supply Master Plan Update (West Yost contract)",
+    category: "Utility/SVP",
+    catClass: "cat-utility",
+    budget: 1160000,
+    budgetDisplay: "$1.16M",
+    phase: "Non-Bond",
+    status: "Active/Construction",
+    statusClass: "status-active",
+    score: 2,
+    facts: [
+      "Contract amendment of $107,880 approved Sept. 2025 — total now $1.16M with West Yost & Associates",
+      "Scope: Water Supply Master Plan and 2025 Urban Water Management Plan",
+      "City manager can authorize additional $50K",
+      "Master plan will drive future water utility CIP independent of Measure I"
+    ],
+    inferences: [
+      "Water master plan completion will unlock water utility capital projects list for 2026+",
+      "Firms tracking City water/sewer should watch for master plan completion and follow-on CIP",
+      "West Yost is incumbent — relationships at City water utility department are active"
+    ],
+    sources: [
+      { label: "Santa Clara News Online — Sept 2025 Council Preview", url: "https://santaclaranews.org/2025/09/15/santa-clara-city-council-preview-charter-review-appointments/" }
+    ]
+  },
+  {
+    id: 22,
+    name: "VTA BART Silicon Valley Phase II — Santa Clara Station",
+    category: "Streets/Transportation",
+    catClass: "cat-streets",
+    budget: 0,
+    budgetDisplay: "VTA-funded",
+    phase: "Non-Bond",
+    status: "Active/Construction",
+    statusClass: "status-active",
+    score: 2,
+    facts: [
+      "Largest single public infrastructure project in Santa Clara County history",
+      "Phase II extends BART from Berryessa through Downtown SJ to Santa Clara terminal station",
+      "Santa Clara is the terminal station for Phase II — significant local infrastructure impact",
+      "Not City-funded — VTA and federal/state funds"
+    ],
+    inferences: [
+      "Santa Clara terminal station will drive ancillary city infrastructure work: streets, pedestrian access, utilities relocation",
+      "Development around the station (Lawrence Station CFD area) already active",
+      "City may need to coordinate Measure I street/transportation projects with BART construction sequencing"
+    ],
+    sources: [
+      { label: "City Projects & Initiatives — BART Phase II", url: "https://www.santaclaraca.gov/i-want-to/stay-informed/current-city-projects-initiatives" }
+    ]
+  }
+];
+
+let sortCol = 'score';
+let sortDir = 'desc';
+let activeFilter = null;
+
+function scoreClass(s) {
+  return `score-${s}`;
+}
+
+function statusClass(s) {
+  const m = { 'Active/Construction':'status-active','Phase 1 Funded':'status-funded','Design':'status-design','Planning':'status-planning','Future Phase':'status-future' };
+  return m[s] || 'status-future';
+}
+
+function formatBudget(n) {
+  if (n === 0) return 'VTA-funded';
+  if (n >= 1e9) return '$' + (n/1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+  return '$' + n.toLocaleString();
+}
+
+function getFilteredProjects() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const status = document.getElementById('statusFilter').value;
+  const score = document.getElementById('scoreFilter').value;
+
+  return projects.filter(p => {
+    if (search && !p.name.toLowerCase().includes(search) && !p.category.toLowerCase().includes(search)) return false;
+    if (cat && p.category !== cat) return false;
+    if (status && p.status !== status) return false;
+    if (score && p.score !== parseInt(score)) return false;
+    return true;
+  });
+}
+
+function renderTable() {
+  const data = getFilteredProjects();
+
+  // Sort
+  data.sort((a, b) => {
+    let av = a[sortCol], bv = b[sortCol];
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  if (data.length === 0) {
+    document.getElementById('noResults').style.display = 'block';
+    document.getElementById('rowCount').textContent = '0 projects';
+    return;
+  }
+
+  document.getElementById('noResults').style.display = 'none';
+  document.getElementById('rowCount').textContent = data.length + ' projects';
+
+  data.forEach(p => {
+    const row = document.createElement('tr');
+    row.id = 'row-' + p.id;
+    row.innerHTML = `
+      <td><span class="score-badge ${scoreClass(p.score)}">${p.score}</span></td>
+      <td class="project-name"><span class="expand-indicator" id="ei-${p.id}">+</span>${p.name}</td>
+      <td><span class="category-pill ${p.catClass}">${p.category.replace('/','\u200B/')}</span></td>
+      <td class="budget-cell">${p.budgetDisplay}</td>
+      <td><span style="font-size:12px;color:var(--text3)">${p.phase}</span></td>
+      <td><span class="status-pill ${statusClass(p.status)}">${p.status}</span></td>
+    `;
+    row.addEventListener('click', () => toggleDetail(p.id));
+    tbody.appendChild(row);
+
+    // Detail row
+    const detailRow = document.createElement('tr');
+    detailRow.className = 'detail-row';
+    detailRow.id = 'detail-' + p.id;
+    const factsHtml = p.facts.map(f => `<li><span class="bullet">●</span>${f}</li>`).join('');
+    const inferHtml = p.inferences.map(f => `<li class="inferred"><span class="bullet">◆</span>${f}</li>`).join('');
+    const srcHtml = p.sources.map(s => `<div><a href="${s.url}" target="_blank">↗ ${s.label}</a></div>`).join('');
+    detailRow.innerHTML = `
+      <td class="detail-cell" colspan="6">
+        <div class="detail-inner">
+          <div class="detail-section">
+            <h4><span class="tag-confirmed">CONFIRMED</span> Confirmed Facts</h4>
+            <ul>${factsHtml}</ul>
+          </div>
+          <div class="detail-section">
+            <h4><span class="tag-inferred">INFERRED</span> Inferences &amp; Implications</h4>
+            <ul>${inferHtml}</ul>
+          </div>
+          <div class="detail-section">
+            <h4>Source Documents</h4>
+            <div class="sources-list">${srcHtml}</div>
+          </div>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(detailRow);
+  });
+}
+
+function toggleDetail(id) {
+  const detailRow = document.getElementById('detail-' + id);
+  const ei = document.getElementById('ei-' + id);
+  const mainRow = document.getElementById('row-' + id);
+  const isOpen = detailRow.classList.contains('open');
+  detailRow.classList.toggle('open', !isOpen);
+  mainRow.classList.toggle('expanded', !isOpen);
+  if (ei) ei.textContent = isOpen ? '+' : '−';
+}
+
+function sortTable(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = col === 'score' || col === 'budget' ? 'desc' : 'asc';
+  }
+  // Update indicators
+  ['score','name','category','budget','phase','status'].forEach(c => {
+    const el = document.getElementById('sort-' + c);
+    if (el) el.textContent = c === sortCol ? (sortDir === 'asc' ? '▲' : '▼') : '';
+    if (el) el.className = 'sort-indicator' + (c === sortCol ? ' active' : '');
+  });
+  renderTable();
+}
+
+function applyQuickFilter(type) {
+  // Reset controls
+  document.getElementById('searchInput').value = '';
+  document.getElementById('catFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('scoreFilter').value = '';
+  document.querySelectorAll('.qf-btn').forEach(b => b.classList.remove('active'));
+
+  if (type === 'clear') { renderTable(); return; }
+
+  const clicked = event.target;
+  clicked.classList.add('active');
+
+  if (type === 'phase1') {
+    document.getElementById('statusFilter').value = 'Phase 1 Funded';
+  } else if (type === 'fire') {
+    document.getElementById('catFilter').value = 'Fire/Emergency';
+  } else if (type === 'aquatics') {
+    document.getElementById('searchInput').value = 'swim';
+  } else if (type === 'streets') {
+    document.getElementById('catFilter').value = 'Streets/Transportation';
+  } else if (type === 'top') {
+    document.getElementById('scoreFilter').value = '5';
+  }
+  renderTable();
+}
+
+function exportCSV() {
+  const data = getFilteredProjects();
+  const headers = ['Score','Project Name','Category','Budget','Phase','Status'];
+  const rows = data.map(p => [p.score, `"${p.name.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&')}"`, `"${p.category}"`, p.budgetDisplay, `"${p.phase}"`, `"${p.status}"`]);
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'santa_clara_measure_i_projects.csv';
+  a.click();
+}
+
+// Event listeners
+document.getElementById('searchInput').addEventListener('input', renderTable);
+document.getElementById('catFilter').addEventListener('change', renderTable);
+document.getElementById('statusFilter').addEventListener('change', renderTable);
+document.getElementById('scoreFilter').addEventListener('change', renderTable);
+
+// Initial render
+renderTable();
+</script>
+</body>
+</html>

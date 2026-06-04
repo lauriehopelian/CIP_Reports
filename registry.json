@@ -1,0 +1,132 @@
+{
+  "meta": {
+    "portal": "Achieveng BD Intelligence Portal",
+    "description": "Capital program intelligence tools for California public agency BD pursuit",
+    "updated": "2026-06-04",
+    "target_agencies": 40,
+    "contact": "Achieveng — Internal BD Use Only"
+  },
+  "agencies": [
+    {
+      "id": "santa_clara",
+      "name": "City of Santa Clara",
+      "subtitle": "Measure I — $400M Infrastructure Bond",
+      "type": "municipality",
+      "region": "Bay Area",
+      "county": "Santa Clara",
+      "status": "active",
+      "tool": "tools/santa_clara.html",
+      "accent": "#1a3a6b",
+      "gold": "#c8932a",
+      "badge": "SC",
+      "total_program": "$400M bond",
+      "program_label": "Measure I GO Bond",
+      "updated": "2026-04",
+      "score_high": 5,
+      "project_count": 22,
+      "tags": ["bond", "fire stations", "aquatics", "parks", "streets", "stormwater"],
+      "key_trigger": "Phase 1 active — $100M allocated Sep 2025. Fire stations, ISC, storm drain all in procurement 2026.",
+      "procurement_portal": "https://www.santaclaraca.gov/business/bids-rfps"
+    },
+    {
+      "id": "fresno_county",
+      "name": "County of Fresno",
+      "subtitle": "Capital Program Intelligence — FY 2025-26",
+      "type": "county",
+      "region": "Central Valley",
+      "county": "Fresno",
+      "status": "active",
+      "tool": "tools/fresno_county.html",
+      "accent": "#1a2a4a",
+      "gold": "#d4a017",
+      "badge": "FC",
+      "total_program": "$945M courthouse + $109M roads/facilities",
+      "program_label": "Multi-Fund CIP",
+      "updated": "2026-04",
+      "score_high": 5,
+      "project_count": 18,
+      "tags": ["courthouse", "sheriff", "roads", "bridges", "water", "ARPA"],
+      "key_trigger": "$945M courthouse design-build RFQ from Judicial Council expected 2026. Sheriff TI urgent — closes July 2026.",
+      "procurement_portal": "https://www.fresnocountyca.gov/Departments/Public-Works-and-Planning/Request-For-Proposals"
+    },
+    {
+      "id": "modesto",
+      "name": "City of Modesto",
+      "subtitle": "Capital Program Intelligence — FY 2025-26",
+      "type": "municipality",
+      "region": "Central Valley",
+      "county": "Stanislaus",
+      "status": "active",
+      "tool": "tools/modesto.html",
+      "accent": "#1a4b8c",
+      "gold": "#c9920a",
+      "badge": "MOD",
+      "total_program": "$639.2M budget / $200M+ utilities CIP",
+      "program_label": "Measure H + Enterprise CIP",
+      "updated": "2026-06",
+      "score_high": 5,
+      "project_count": 14,
+      "tags": ["wastewater", "parks", "transportation", "Measure H", "on-call CM"],
+      "key_trigger": "CM/Inspection on-call RFQ 2026-08 due June 30, 2026. River Trunk PS active through 2028. SR-99 Briggsmore interchange CTC allocation by June 30.",
+      "procurement_portal": "https://procurement.opengov.com/portal/modestogov"
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "santa_maria",
+      "name": "City of Santa Maria",
+      "status": "stub",
+      "tool": null,
+      "key_trigger": "~$500M wastewater regulatory mandate. Watch timeline."
+    },
+    {
+      "id": "vacaville",
+      "name": "City of Vacaville",
+      "status": "stub",
+      "tool": null,
+      "key_trigger": "November 2026 sales tax measure vote."
+    },
+    {
+      "id": "san_bruno",
+      "name": "City of San Bruno",
+      "status": "stub",
+      "tool": null,
+      "key_trigger": "Fire Station 52 replacement underway. $156M capital budget."
+    },
+    {
+      "id": "menlo_park",
+      "name": "City of Menlo Park",
+      "status": "stub",
+      "tool": null,
+      "key_trigger": "Pending data extraction."
+    },
+    {
+      "id": "morgan_hill",
+      "name": "City of Morgan Hill",
+      "status": "stub",
+      "tool": null,
+      "key_trigger": "Pending data extraction."
+    },
+    {
+      "id": "foothill_de_anza",
+      "name": "Foothill-De Anza CCD",
+      "status": "stub",
+      "tool": null,
+      "key_trigger": "Pending data extraction."
+    },
+    {
+      "id": "santa_clara_unified",
+      "name": "Santa Clara Unified SD",
+      "status": "stub",
+      "tool": null,
+      "key_trigger": "Pending data extraction."
+    },
+    {
+      "id": "contra_costa_ccd",
+      "name": "Contra Costa CCD",
+      "status": "stub",
+      "tool": null,
+      "key_trigger": "Measure G election June 2, 2026."
+    }
+  ]
+}
