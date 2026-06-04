@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Achieveng — BD Intelligence Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #111318;
+  --surface2: #171b22;
+  --border: #1e2430;
+  --border2: #2a3240;
+  --text: #e4e8ef;
+  --text2: #7a8699;
+  --text3: #3d4a5c;
+  --gold: #c9920a;
+  --gold2: #f0b429;
+  --accent: #2563eb;
+  --green: #10b981;
+  --red: #ef4444;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Sora', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* BACKGROUND GRID */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(201,146,10,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,146,10,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* RAINBOW BAR */
+.rainbow-bar {
+  height: 3px;
+  background: linear-gradient(90deg,#ef4444 0%,#f97316 15%,#eab308 28%,#22c55e 42%,#06b6d4 57%,#3b82f6 70%,#8b5cf6 83%,#ec4899 100%);
+  background-size: 200% 100%;
+  animation: rb 6s linear infinite;
+  position: relative; z-index: 10;
+}
+@keyframes rb { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+
+/* HEADER */
+header {
+  position: relative; z-index: 10;
+  padding: 40px 40px 32px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.85) 100%);
+}
+
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wordmark-top {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.wordmark-main {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.wordmark-main span {
+  color: var(--gold);
+}
+
+.wordmark-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.header-stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.stat-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.stat-num.live { color: var(--green); }
+.stat-num.pending { color: var(--gold); }
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* MAIN */
+main {
+  position: relative; z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 40px 60px;
+}
+
+/* SECTION HEADERS */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.section-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 1px;
+}
+
+/* URGENT BANNER */
+.urgent-banner {
+  background: linear-gradient(135deg, rgba(201,146,10,0.08), rgba(201,146,10,0.04));
+  border: 1px solid rgba(201,146,10,0.25);
+  border-left: 3px solid var(--gold);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 36px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.urgent-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(201,146,10,0.15);
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.urgent-items {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.urgent-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.urgent-item-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.urgent-item-date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gold);
+}
+
+/* AGENCY GRID */
+.agency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.agency-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  position: relative;
+}
+
+.agency-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-2px);
+}
+
+.agency-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px var(--card-accent, var(--gold));
+}
+
+.agency-card:hover::after { opacity: 0.4; }
+
+.card-header {
+  padding: 20px 20px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+
+.card-title-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-subtitle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-arrow {
+  font-size: 16px;
+  color: var(--text3);
+  flex-shrink: 0;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.agency-card:hover .card-arrow {
+  color: var(--text2);
+  transform: translateX(3px);
+}
+
+.card-body {
+  padding: 16px 20px;
+}
+
+.card-program {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.program-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.program-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-trigger {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+.card-trigger strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  color: var(--text3);
+  text-transform: uppercase;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+}
+
+.score-dots {
+  display: flex;
+  gap: 3px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border2);
+}
+
+.dot.filled { background: var(--green); }
+
+/* PIPELINE GRID */
+.pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+  margin-bottom: 48px;
+}
+
+.pipeline-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.pipeline-card:hover { opacity: 1; }
+
+.pipeline-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border2);
+  flex-shrink: 0;
+}
+
+.status-dot.stub { background: var(--text3); }
+.status-dot.active { background: var(--green); }
+.status-dot.building { background: var(--gold); }
+
+.pipeline-trigger {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.5;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* HOW TO ADD */
+.add-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 40px;
+}
+
+.add-section h3 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.step-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  background: rgba(201,146,10,0.1);
+  border: 1px solid rgba(201,146,10,0.2);
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-text {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.55;
+}
+
+.step-text strong { color: var(--text); font-weight: 600; }
+
+/* FOOTER */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-left {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.footer-right {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 1px;
+}
+
+/* ANIMATIONS */
+.agency-card {
+  animation: fadeUp 0.4s ease both;
+}
+
+.agency-card:nth-child(1) { animation-delay: 0.05s; }
+.agency-card:nth-child(2) { animation-delay: 0.10s; }
+.agency-card:nth-child(3) { animation-delay: 0.15s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* MOBILE */
+@media (max-width: 700px) {
+  header { padding: 24px 20px 20px; }
+  main { padding: 24px 16px 40px; }
+  .wordmark-main { font-size: 24px; }
+  .header-stats { gap: 20px; }
+  .stat-num { font-size: 22px; }
+  .agency-grid { grid-template-columns: 1fr; }
+  .pipeline-grid { grid-template-columns: 1fr 1fr; }
+  footer { padding: 16px 20px; flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 480px) {
+  .pipeline-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="rainbow-bar"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="wordmark">
+      <div class="wordmark-top">Internal BD Intelligence</div>
+      <div class="wordmark-main">Achieve<span>ng</span></div>
+      <div class="wordmark-sub">// California Public Agency Capital Program Portal</div>
+    </div>
+    <div class="header-stats">
+      <div class="stat">
+        <div class="stat-num live" id="activeCount">3</div>
+        <div class="stat-label">Active Tools</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num pending" id="pipelineCount">8</div>
+        <div class="stat-label">In Pipeline</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="targetCount">40</div>
+        <div class="stat-label">Target Agencies</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- URGENT BANNER -->
+  <div class="urgent-banner">
+    <div class="urgent-label">&#9650; Action Required</div>
+    <div class="urgent-items">
+      <div class="urgent-item">
+        <div class="urgent-item-title">Modesto CM/Inspection On-Call RFQ 2026-08</div>
+        <div class="urgent-item-date">Due June 30, 2026 &mdash; 26 days</div>
+      </div>
+      <div class="urgent-item">
+        <div class="urgent-item-title">SR-99 Briggsmore Interchange CTC Allocation</div>
+        <div class="urgent-item-date">Deadline June 30, 2026</div>
+      </div>
+      <div class="urgent-item">
+        <div class="urgent-item-title">Fresno County Sheriff Acquisition Close</div>
+        <div class="urgent-item-date">July 7, 2026 &mdash; TI work begins immediately</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVE TOOLS -->
+  <div class="section-header">
+    <div class="section-label">Active Intelligence Tools</div>
+    <div class="section-line"></div>
+    <div class="section-count" id="activeLabel">3 agencies</div>
+  </div>
+
+  <div class="agency-grid" id="agencyGrid"></div>
+
+  <!-- PIPELINE -->
+  <div class="section-header">
+    <div class="section-label">Pipeline &mdash; Tools In Progress</div>
+    <div class="section-line"></div>
+    <div class="section-count" id="pipelineLabel">8 agencies</div>
+  </div>
+
+  <div class="pipeline-grid" id="pipelineGrid"></div>
+
+  <!-- HOW TO ADD -->
+  <div class="add-section">
+    <h3>// Adding a New Agency</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>Research the agency</strong> — fetch CIP documents, budget PDFs, bond reports, procurement portals. Confirm funding sources and active projects.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>Build the tool</strong> — generate the agency HTML intelligence tool following the standard template. Score projects 1&ndash;5, separate confirmed from inferred.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Add to registry</strong> — add an entry to <code style="font-family:'IBM Plex Mono',monospace;color:var(--gold)">registry.json</code> with agency metadata, accent color, key trigger, and tool path.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text"><strong>Drop the file</strong> — upload the HTML to <code style="font-family:'IBM Plex Mono',monospace;color:var(--gold)">tools/</code> and push to GitHub. Portal updates automatically.</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-left">Achieveng BD Intelligence Portal &mdash; Internal Use Only &mdash; Updated June 2026</div>
+  <div class="footer-right">// NOT FOR DISTRIBUTION</div>
+</footer>
+
+<script>
+const registry = {
+  "agencies": [
+    {
+      "id": "santa_clara",
+      "name": "City of Santa Clara",
+      "subtitle": "Measure I — $400M Infrastructure Bond",
+      "type": "municipality",
+      "region": "Bay Area",
+      "status": "active",
+      "tool": "tools/santa_clara.html",
+      "accent": "#1a3a6b",
+      "gold": "#c8932a",
+      "badge": "SC",
+      "total_program": "$400M bond",
+      "program_label": "Measure I GO Bond",
+      "updated": "Apr 2026",
+      "score_high": 5,
+      "project_count": 22,
+      "tags": ["bond", "fire stations", "aquatics", "streets"],
+      "key_trigger": "<strong>Phase 1 active</strong> — $100M allocated Sep 2025. Fire stations, ISC, storm drain all in procurement 2026."
+    },
+    {
+      "id": "fresno_county",
+      "name": "County of Fresno",
+      "subtitle": "Capital Program Intelligence — FY 2025-26",
+      "type": "county",
+      "region": "Central Valley",
+      "status": "active",
+      "tool": "tools/fresno_county.html",
+      "accent": "#1a2a4a",
+      "gold": "#d4a017",
+      "badge": "FC",
+      "total_program": "$945M+ pipeline",
+      "program_label": "Multi-Fund CIP",
+      "updated": "Apr 2026",
+      "score_high": 5,
+      "project_count": 18,
+      "tags": ["courthouse", "sheriff", "roads", "ARPA"],
+      "key_trigger": "<strong>$945M courthouse design-build RFQ</strong> from Judicial Council expected 2026. Sheriff TI urgent — closes July 7."
+    },
+    {
+      "id": "modesto",
+      "name": "City of Modesto",
+      "subtitle": "Capital Program Intelligence — FY 2025-26",
+      "type": "municipality",
+      "region": "Central Valley",
+      "status": "active",
+      "tool": "tools/modesto.html",
+      "accent": "#1a4b8c",
+      "gold": "#c9920a",
+      "badge": "MOD",
+      "total_program": "$200M+ utilities CIP",
+      "program_label": "Measure H + Enterprise",
+      "updated": "Jun 2026",
+      "score_high": 5,
+      "project_count": 14,
+      "tags": ["wastewater", "parks", "on-call CM", "Measure H"],
+      "key_trigger": "<strong>CM/Inspection RFQ due June 30</strong> — 26 days. River Trunk PS active through 2028. Briggsmore interchange CTC June 30."
+    }
+  ],
+  "pipeline": [
+    { "name": "City of Santa Maria", "trigger": "~$500M wastewater regulatory mandate. Timeline watch." },
+    { "name": "City of Vacaville", "trigger": "November 2026 sales tax measure vote." },
+    { "name": "City of San Bruno", "trigger": "Fire Station 52 replacement underway. $156M capital budget." },
+    { "name": "City of Menlo Park", "trigger": "Pending data extraction." },
+    { "name": "City of Morgan Hill", "trigger": "Pending data extraction." },
+    { "name": "Foothill-De Anza CCD", "trigger": "Pending data extraction." },
+    { "name": "Santa Clara Unified SD", "trigger": "Pending data extraction." },
+    { "name": "Contra Costa CCD", "trigger": "Measure G election June 2, 2026. Results pending." }
+  ]
+};
+
+function scoreDotsHTML(score) {
+  let html = '<div class="score-dots">';
+  for (let i = 1; i <= 5; i++) {
+    html += `<div class="dot${i <= score ? ' filled' : ''}"></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function buildAgencyCards() {
+  const grid = document.getElementById('agencyGrid');
+  registry.agencies.forEach(a => {
+    const tags = a.tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('');
+    const card = document.createElement('a');
+    card.href = a.tool;
+    card.className = 'agency-card';
+    card.style.setProperty('--card-accent', a.gold);
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-badge" style="background:linear-gradient(135deg,${a.accent},${a.accent}cc)">${a.badge}</div>
+        <div class="card-title-block">
+          <div class="card-name">${a.name}</div>
+          <div class="card-subtitle">${a.subtitle}</div>
+        </div>
+        <div class="card-arrow">&#8594;</div>
+      </div>
+      <div class="card-body">
+        <div class="card-program">
+          <div>
+            <div class="program-value">${a.total_program}</div>
+            <div class="program-label">${a.program_label}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">Updated</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2)">${a.updated}</div>
+          </div>
+        </div>
+        <div class="card-trigger">${a.key_trigger}</div>
+        <div class="card-footer">
+          <div class="card-tags">${tags}</div>
+          <div class="card-meta">
+            <span class="project-count">${a.project_count} projects</span>
+            ${scoreDotsHTML(a.score_high)}
+          </div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function buildPipelineCards() {
+  const grid = document.getElementById('pipelineGrid');
+  registry.pipeline.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'pipeline-card';
+    card.innerHTML = `
+      <div class="pipeline-name">
+        <div class="status-dot stub"></div>
+        ${p.name}
+      </div>
+      <div class="pipeline-trigger">${p.trigger}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+buildAgencyCards();
+buildPipelineCards();
+</script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City of Modesto — Capital Program Intelligence Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a; --surface: #111318; --surface2: #171b22;
+  --border: #222830; --text: #e4e8ef; --text2: #8a95a8; --text3: #4a5568;
+  --mod-blue: #1a4b8c; --mod-gold: #c9920a; --accent: #2563eb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Sora', system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
+.rainbow-bar { height: 3px; background: linear-gradient(90deg,#ef4444 0%,#f97316 15%,#eab308 28%,#22c55e 42%,#06b6d4 57%,#3b82f6 70%,#8b5cf6 83%,#ec4899 100%); background-size: 200% 100%; animation: rb 6s linear infinite; }
+@keyframes rb { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+header { background: linear-gradient(135deg,#080a0e 0%,#0d1a32 50%,#0a1220 100%); border-bottom: 1px solid var(--border); padding: 20px 32px; position: sticky; top: 0; z-index: 100; }
+.hi { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.ab { display: flex; align-items: center; gap: 14px; }
+.seal { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg,var(--mod-blue),#2563eb); border: 2px solid var(--mod-gold); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono',monospace; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.an { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+.as { font-size: 11px; color: var(--mod-gold); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-family: 'IBM Plex Mono',monospace; }
+.hm { display: flex; gap: 10px; flex-wrap: wrap; }
+.mp { background: rgba(255,255,255,0.06); border: 1px solid rgba(201,146,10,0.3); border-radius: 20px; padding: 5px 12px; font-size: 11px; color: #9aa5b8; font-family: 'IBM Plex Mono',monospace; }
+.mp span { color: var(--mod-gold); font-weight: 700; }
+.main { max-width: 1440px; margin: 0 auto; padding: 24px 20px; }
+.bo { display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 12px; margin-bottom: 28px; }
+.bbc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.bbc .lbl { font-size: 10px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px; font-family: 'IBM Plex Mono',monospace; }
+.bbc .amt { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 8px; font-family: 'IBM Plex Mono',monospace; letter-spacing: -1px; }
+.bbc .bb { background: var(--border); height: 4px; border-radius: 2px; overflow: hidden; }
+.bbc .bf { height: 100%; border-radius: 2px; background: linear-gradient(90deg,var(--mod-blue),var(--accent)); }
+.bbc .sub { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: 'IBM Plex Mono',monospace; }
+.ig { display: grid; grid-template-columns: repeat(auto-fit,minmax(340px,1fr)); gap: 14px; margin-bottom: 28px; }
+.ic { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+.ic h3 { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mod-gold); margin-bottom: 14px; display: flex; align-items: center; gap: 7px; font-family: 'IBM Plex Mono',monospace; }
+.ib { font-size: 13px; color: var(--text2); line-height: 1.65; }
+.ib ul { padding-left: 0; list-style: none; }
+.ib ul li { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 8px; }
+.ib ul li:last-child { border-bottom: none; }
+.ib ul li::before { content: '\2192'; color: var(--mod-gold); flex-shrink: 0; margin-top: 1px; }
+.tc { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #34d399; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; font-family: 'IBM Plex Mono',monospace; }
+.ti { background: rgba(201,146,10,0.12); border: 1px solid rgba(201,146,10,0.3); color: #fbbf24; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; font-family: 'IBM Plex Mono',monospace; }
+.tw { background: rgba(249,115,22,0.12); border: 1px solid rgba(249,115,22,0.3); color: #fb923c; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; white-space: nowrap; font-family: 'IBM Plex Mono',monospace; }
+.ctrl { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.ctrl input { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 7px 12px; font-size: 13px; width: 210px; font-family: 'Sora',sans-serif; }
+.ctrl input:focus { outline: none; border-color: var(--accent); }
+.ctrl select { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 7px 10px; font-size: 12px; cursor: pointer; font-family: 'IBM Plex Mono',monospace; }
+.qfw { display: flex; flex-wrap: wrap; gap: 7px; }
+.qfb { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); border-radius: 20px; padding: 4px 11px; font-size: 11px; cursor: pointer; transition: all 0.15s; font-family: 'IBM Plex Mono',monospace; }
+.qfb:hover,.qfb.active { background: var(--mod-blue); border-color: var(--accent); color: #fff; }
+.tw2 { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.th2 { display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+.th2 h2 { font-size: 13px; font-weight: 700; color: var(--text); font-family: 'IBM Plex Mono',monospace; }
+.cnt { font-size: 11px; color: var(--text3); background: var(--bg); border: 1px solid var(--border); padding: 3px 10px; border-radius: 12px; font-family: 'IBM Plex Mono',monospace; }
+.ebs { display: flex; gap: 7px; }
+.eb { background: var(--surface); border: 1px solid var(--border); color: var(--text2); border-radius: 5px; padding: 4px 9px; font-size: 11px; cursor: pointer; transition: all 0.15s; font-family: 'IBM Plex Mono',monospace; }
+.eb:hover { border-color: var(--mod-gold); color: var(--mod-gold); }
+table { width: 100%; border-collapse: collapse; }
+thead th { background: #080a0e; color: var(--text3); font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 10px 13px; text-align: left; border-bottom: 1px solid var(--border); position: sticky; top: 91px; cursor: pointer; user-select: none; white-space: nowrap; font-family: 'IBM Plex Mono',monospace; }
+thead th:hover { color: var(--text); }
+tbody tr { border-bottom: 1px solid rgba(34,40,48,0.7); cursor: pointer; transition: background 0.1s; }
+tbody tr:hover { background: rgba(37,99,235,0.05); }
+tbody tr.exp { background: rgba(37,99,235,0.07); }
+td { padding: 10px 13px; font-size: 13px; vertical-align: middle; }
+td.pn { font-weight: 600; color: var(--text); max-width: 300px; }
+td.pn .ei { display: inline-block; width: 15px; height: 15px; border-radius: 3px; background: var(--surface2); border: 1px solid var(--border); text-align: center; line-height: 14px; font-size: 10px; margin-right: 8px; color: var(--text3); vertical-align: middle; font-family: 'IBM Plex Mono',monospace; }
+.sb { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; font-size: 14px; font-weight: 800; font-family: 'IBM Plex Mono',monospace; }
+.s5{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)}
+.s4{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.s3{background:rgba(201,146,10,.15);color:#fbbf24;border:1px solid rgba(201,146,10,.3)}
+.s2{background:rgba(249,115,22,.12);color:#fb923c;border:1px solid rgba(249,115,22,.3)}
+.cp{display:inline-block;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:700;white-space:nowrap;font-family:'IBM Plex Mono',monospace}
+.cww{background:rgba(6,182,212,.12);color:#22d3ee;border:1px solid rgba(6,182,212,.2)}
+.cwtr{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+.ctr{background:rgba(201,146,10,.12);color:#fbbf24;border:1px solid rgba(201,146,10,.2)}
+.cpk{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.2)}
+.cps{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.chs{background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.2)}
+.sp{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;font-family:'IBM Plex Mono',monospace}
+.sac{background:rgba(16,185,129,.12);color:#34d399}
+.sde{background:rgba(59,130,246,.12);color:#60a5fa}
+.spl{background:rgba(201,146,10,.12);color:#fbbf24}
+.sfu{background:rgba(74,85,104,.2);color:#94a3b8}
+.bc{font-weight:700;font-size:13px;white-space:nowrap;font-family:'IBM Plex Mono',monospace}
+.dr{display:none}.dr.open{display:table-row}
+.dc{padding:0!important;border-bottom:2px solid var(--mod-gold)!important}
+.di{background:#090b0f;padding:20px 24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+.ds h4{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace}
+.ds h4::before{content:'';display:block;width:3px;height:11px;background:var(--mod-gold);border-radius:2px}
+.ds ul{list-style:none;padding:0}
+.ds ul li{font-size:12px;color:var(--text2);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:7px;align-items:flex-start}
+.ds ul li:last-child{border-bottom:none}
+.ds ul li .b{color:var(--mod-gold);flex-shrink:0;font-size:10px;margin-top:3px}
+.ds ul li.inf .b{color:#fbbf24}
+.sl{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
+.sl a{color:#60a5fa;text-decoration:none}.sl a:hover{text-decoration:underline}
+.sl div{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}.sl div:last-child{border-bottom:none}
+footer{text-align:center;padding:20px;color:var(--text3);font-size:11px;border-top:1px solid var(--border);margin-top:32px;font-family:'IBM Plex Mono',monospace}
+.nor{text-align:center;padding:40px;color:var(--text3);font-size:14px}
+.si{margin-left:4px;opacity:.4}.si.active{opacity:1;color:var(--mod-gold)}
+@media(max-width:900px){.di{grid-template-columns:1fr}.ig{grid-template-columns:1fr}.bo{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="rainbow-bar"></div>
+<header>
+  <div class="hi">
+    <div class="ab">
+      <div class="seal">MOD</div>
+      <div>
+        <div class="an">City of Modesto</div>
+        <div class="as">Capital Program Intelligence Tool &middot; FY 2025&ndash;26 &amp; Forward</div>
+      </div>
+    </div>
+    <div class="hm">
+      <div class="mp">Total Budget: <span>$639.2M (FY25-26)</span></div>
+      <div class="mp">Measure H: <span>$40M+/yr</span></div>
+      <div class="mp">River Trunk PS: <span>Active thru 2028</span></div>
+      <div class="mp">StanCOG Measure L: <span>16 Regional Projects</span></div>
+      <div class="mp">Updated: <span>June 2026</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+<div class="bo">
+  <div class="bbc"><div class="lbl">Wastewater / Utilities CIP</div><div class="amt">$200M+</div><div class="bb"><div class="bf" style="width:80%"></div></div><div class="sub">River Trunk PS, La Loma, Sutter/Jennings plants, well program</div></div>
+  <div class="bbc"><div class="lbl">Transportation (Measure L)</div><div class="amt">~$77M</div><div class="bb"><div class="bf" style="width:55%"></div></div><div class="sub">SR-99 Briggsmore/Carpenter + North County Corridor</div></div>
+  <div class="bbc"><div class="lbl">Measure H &mdash; Annual Capital</div><div class="amt">$40M+/yr</div><div class="bb"><div class="bf" style="width:45%"></div></div><div class="sub">Parks, streets, public safety, sidewalks &mdash; recurring</div></div>
+  <div class="bbc"><div class="lbl">Parks (Measure H)</div><div class="amt">$10.1M</div><div class="bb"><div class="bf" style="width:30%"></div></div><div class="sub">6-park playground renovation + deferred maintenance backlog</div></div>
+  <div class="bbc"><div class="lbl">Public Safety Infrastructure</div><div class="amt">~$12M</div><div class="bb"><div class="bf" style="width:20%"></div></div><div class="sub">Fire Station 1 &middot; Police radio &middot; RTCC/CAD</div></div>
+  <div class="bbc"><div class="lbl">Downtown Housing</div><div class="amt">$68.8M</div><div class="bb"><div class="bf" style="width:35%"></div></div><div class="sub">7th Street Village &middot; Under construction &middot; 2-yr timeline</div></div>
+</div>
+
+<div class="ig">
+  <div class="ic">
+    <h3>&#127919; Clearest Near-Term Paths (Active)</h3>
+    <div class="ib"><ul>
+      <li>River Trunk Pump Station &amp; Gravity Realignment &mdash; Active construction Jan 2026 through end of 2028. Carollo Engineers (design), West Yost (CM). Tuolumne Blvd closed through mid-2026. <span class="tc">CONFIRMED</span></li>
+      <li>La Loma Sewer &amp; Water Rehab &mdash; Multiple active phases: Phase 3A at 96%, Phase 2C at 85%, Phase 1 at 32%. Follow-on bid packages expected through 2027. <span class="tc">CONFIRMED</span></li>
+      <li>Measure H Playground Renovations (6 parks) &mdash; Contracts awarded; Sutter Neighborhood Park and Brewer's Rose begin spring 2026. Lakewood Park complete. $10.1M program. <span class="tc">CONFIRMED</span></li>
+      <li>SR-99 / Briggsmore&ndash;Carpenter Interchange &mdash; ~$77M construction. CTC must allocate by June 30, 2026. All 67 R/W appraisals complete, offers made. Construction imminent post-allocation. <span class="tc">CONFIRMED</span></li>
+      <li>Fire Station 1 Rehab &mdash; $850K federal FY 2026 earmark (Rep. Gray). Bay doors, firefighter safety upgrades at downtown station. <span class="tc">CONFIRMED</span></li>
+      <li>New 0% Utility Projects &mdash; Jennings Well Treatment, Woodland Lift Station, Sonoma Trunk Phases 3&amp;4, Bret Hart water mains all newly authorized at 0% &mdash; near-term procurement queue. <span class="tc">CONFIRMED</span></li>
+    </ul></div>
+  </div>
+  <div class="ic">
+    <h3>&#128301; Intelligence &amp; Inferences</h3>
+    <div class="ib"><ul>
+      <li>Measure H generates $40M+ annually with no sunset &mdash; most stable recurring capital program. Competes with police/fire staffing for annual allocation. <span class="tc">CONFIRMED</span></li>
+      <li>City moved to OpenGov eProcurement Feb 2025 &mdash; all solicitations posted there. Firms not registered are missing active bids. <span class="tc">CONFIRMED</span></li>
+      <li>Fire coverage study commissioned ($90K Measure H) &mdash; will identify new station locations and ALS gaps. New station construction likely in 2027+. <span class="ti">INFERRED</span></li>
+      <li>Central Valley Regional Board revised Modesto WDRs at Dec 2025 meeting &mdash; new discharge conditions for Sutter/Jennings campus will drive additional plant capital. <span class="tc">CONFIRMED</span></li>
+      <li>7th Street Village broke ground Feb 2026 (~2 yr) &mdash; catalytic downtown project; ancillary ROW/streetscape/utility work expected around site. <span class="tc">CONFIRMED</span></li>
+      <li>Modesto Fire provides regional service to Ceres, Turlock, Salida (contracts through June 2026) &mdash; renewal expected; expanded area increases apparatus and station upgrade urgency. <span class="ti">INFERRED</span></li>
+      <li>North County Corridor Phase 1 under construction (open 2027). Phase 2 SR-132/SR-99 interchange is next in StanCOG STIP queue. <span class="tc">CONFIRMED</span></li>
+    </ul></div>
+  </div>
+  <div class="ic">
+    <h3>&#9888;&#65039; Structural Constraints &amp; Red Flags</h3>
+    <div class="ib"><ul>
+      <li>No general obligation bond &mdash; all capital is pay-as-you-go from enterprise rates, Measure H, grants, Measure L. Limits large single-project bonding. <span class="ti">INFERRED</span></li>
+      <li>Measure H is a general tax, not restricted to capital &mdash; Council can reallocate to operations. Public safety staffing pressure competes annually. <span class="tw">WATCH</span></li>
+      <li>Federal funding uncertainty: $1.88M Gray earmarks (police radio + FS1) subject to federal appropriations environment in 2026. <span class="tw">WATCH</span></li>
+      <li>Wastewater regulatory pressure &mdash; new WDRs will require rate study and potential rate increase to fund expanded Sutter/Jennings capital program. <span class="tw">WATCH</span></li>
+      <li>SR-99 Briggsmore-Carpenter depends on CTC allocation by June 30, 2026. Miss that window = construction delay of 6+ months. <span class="tc">CONFIRMED</span></li>
+      <li>West Yost incumbent on River Trunk CM &mdash; incumbency advantage is significant. Competitors must build City Utilities relationships proactively now. <span class="ti">INFERRED</span></li>
+    </ul></div>
+  </div>
+  <div class="ic">
+    <h3>&#127970; Best Targets by Firm Type</h3>
+    <div class="ib"><ul>
+      <li><strong style="color:var(--text)">Civil / Pipeline / Wastewater</strong> &mdash; River Trunk PS (through 2028), La Loma multi-phase, Sonoma Trunk Extensions, West Trunk Rehab, Bret Hart water mains, Woodland LS. Utilities CIP is the deepest and most sustained program city-wide.</li>
+      <li><strong style="color:var(--text)">Transportation / Interchange / Heavy Civil</strong> &mdash; SR-99/Briggsmore-Carpenter ($77M, imminent), North County Corridor Phase 2 SR-132 interchange (programmed), SR 99 ramp metering at Standiford/Beckwith.</li>
+      <li><strong style="color:var(--text)">Landscape / Parks / Playground</strong> &mdash; Measure H parks: 6-park playground renovation active; multi-year deferred maintenance backlog; 2 Senior Landscape Architects now on city staff to plan future projects.</li>
+      <li><strong style="color:var(--text)">Architecture / Fire Facilities</strong> &mdash; Fire Station 1 rehab ($850K); coverage study will identify new station sites (construction 2027+); ALS apparatus equipment procurement also underway.</li>
+      <li><strong style="color:var(--text)">Program / Construction Management</strong> &mdash; Multiple concurrent wastewater contracts. West Yost incumbent on River Trunk. Watch OpenGov for successor on-call engineering and inspection RFPs.</li>
+      <li><strong style="color:var(--text)">Water Treatment / Specialty Systems</strong> &mdash; Well 312 Treatment, Jennings Well Treatment, Jennings Corrosion Control. Recurring well development program. New WDRs will trigger plant upgrade obligations.</li>
+    </ul></div>
+  </div>
+  <div class="ic">
+    <h3>&#128678; Watchlist Triggers</h3>
+    <div class="ib"><ul>
+      <li>Modesto OpenGov eProcurement &mdash; all RFPs/IFBs posted here since Feb 2025. Register for email alerts. Watch for: wastewater on-call engineering, Measure H parks/street bundles, Briggsmore interchange bid.</li>
+      <li>CTC allocation for SR-99/Briggsmore-Carpenter &mdash; required by June 30, 2026. If approved, construction RFP follows within weeks. Monitor CTC agenda (monthly meetings).</li>
+      <li>Fire coverage study results &mdash; Measure H-funded, in progress. Identifies new station location(s). Triggers A/E selection for fire station design in 2026&ndash;2027.</li>
+      <li>Wastewater WDRs compliance schedule &mdash; new conditions from Dec 2025 board action. City must submit implementation schedule; new CIP projects follow within 6&ndash;18 months.</li>
+      <li>Measure H Oversight Board annual report &mdash; annual summary of all Measure H expenditures and upcoming allocations. Good source for park/street project backlog status.</li>
+      <li>StanCOG Measure L Oversight Committee (monthly) &mdash; tracks Phase 2 SR-132 programming. Project becomes active fast once Phase 1 (open 2027) wraps.</li>
+    </ul></div>
+  </div>
+  <div class="ic">
+    <h3>&#128202; BD Confidence Rubric (1&ndash;5)</h3>
+    <div class="ib"><ul>
+      <li><strong style="color:#34d399">5 &mdash; Highest:</strong> Active construction or contract awarded. Clear scope, funded, underway or imminent bid expected.</li>
+      <li><strong style="color:#60a5fa">4 &mdash; High:</strong> Funded, scoped, procurement within 12 months. Strong political will.</li>
+      <li><strong style="color:#fbbf24">3 &mdash; Medium:</strong> In program with funding identified. Timeline 1&ndash;3 years. Some external dependencies.</li>
+      <li><strong style="color:#fb923c">2 &mdash; Lower:</strong> Planned but contingent on regulatory action, study outcome, or ballot. Monitor.</li>
+      <li><strong style="color:#f87171">1 &mdash; Watch:</strong> Adjacent program, non-city funded, or highly contingent. Not an immediate pursuit.</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="ctrl">
+  <input type="text" id="searchInput" placeholder="Search projects...">
+  <select id="catFilter">
+    <option value="">All Categories</option>
+    <option value="Wastewater/Utilities">Wastewater / Utilities</option>
+    <option value="Water Supply">Water Supply</option>
+    <option value="Transportation">Transportation</option>
+    <option value="Parks/Recreation">Parks &amp; Recreation</option>
+    <option value="Public Safety">Public Safety</option>
+    <option value="Housing/Downtown">Housing / Downtown</option>
+  </select>
+  <select id="statusFilter">
+    <option value="">All Status</option>
+    <option value="Active/Construction">Active / Construction</option>
+    <option value="Design/Procurement">Design / Procurement</option>
+    <option value="Planning">Planning</option>
+  </select>
+  <select id="scoreFilter">
+    <option value="">All Scores</option>
+    <option value="5">Score 5</option>
+    <option value="4">Score 4</option>
+    <option value="3">Score 3</option>
+    <option value="2">Score 2</option>
+  </select>
+  <div class="qfw">
+    <button class="qfb" onclick="qf('active')">Active Now</button>
+    <button class="qfb" onclick="qf('ww')">Wastewater</button>
+    <button class="qfb" onclick="qf('trans')">Transportation</button>
+    <button class="qfb" onclick="qf('parks')">Parks</button>
+    <button class="qfb" onclick="qf('top')">Score 4&ndash;5</button>
+    <button class="qfb" onclick="qf('clear')">Clear</button>
+  </div>
+</div>
+
+<div class="tw2">
+  <div class="th2">
+    <h2>// PROJECT OPPORTUNITY INVENTORY</h2>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="cnt" id="rowCount">&mdash; projects</span>
+      <div class="ebs">
+        <button class="eb" onclick="exportCSV()">&#11015; CSV</button>
+        <button class="eb" onclick="window.print()">&#128424; Print</button>
+      </div>
+    </div>
+  </div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr>
+      <th onclick="srt('score')">Score <span class="si active" id="si-score">&#9660;</span></th>
+      <th onclick="srt('name')">Project Name <span class="si" id="si-name"></span></th>
+      <th onclick="srt('category')">Category <span class="si" id="si-category"></span></th>
+      <th onclick="srt('budget')">Est. Value <span class="si" id="si-budget"></span></th>
+      <th onclick="srt('funding')">Funding Source <span class="si" id="si-funding"></span></th>
+      <th onclick="srt('status')">Status <span class="si" id="si-status"></span></th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  </div>
+  <div class="nor" id="noResults" style="display:none">No projects match filters.</div>
+</div>
+</div>
+
+<footer>
+  City of Modesto &middot; Capital Program Intelligence Tool &middot; FY 2025&ndash;26<br>
+  Sources: modestogov.com (CIP tracker, Measure H portal, River Trunk project page), StanCOG Measure L Oversight Committee (Sep 2025), Rep. Adam Gray press releases (Feb 2026), Modesto Bee, State Water Board WDR filings (Dec 2025), CEQAnet NOD (Jun 2025), GovTech (Jun 2025)<br>
+  Generated June 2026 &middot; For internal business development use only
+</footer>
+
+<script>
+const P=[
+{id:1,name:"River Trunk Pump Station — Phase 2 Construction",category:"Wastewater/Utilities",cc:"cww",budget:0,bd:"Not disclosed",funding:"City Enterprise Fund (Utility Rates)",status:"Active/Construction",score:5,
+ facts:["Active construction began January 2026, runs through end of 2028","Installs new trunk sewer from Beard Brook Siphon to pump station, plus force mains to River Trunk Gravity project","River Trunk carries ~25% of city domestic wastewater — highest-priority system","Carollo Engineers is Engineer of Record; West Yost Associates is Construction Manager","Tuolumne Boulevard closed Feb–June 2026; coordinated with 7th Street Bridge project","Project driven by 2016 Wastewater Collection Systems Master Plan priority findings"],
+ inferences:["West Yost is incumbent CM — track successor on-call wastewater CM RFP via OpenGov","3-year window (2026–2028) creates ongoing supplemental services and specialty subconsultant opportunities","Carollo EOR role creates MEP, structural, SCADA subconsultant opportunities","New WDRs (Dec 2025) may expand Sutter plant improvements scope — watch for new CIP authorizations"],
+ sources:[{label:"City of Modesto — River Trunk Pump Station Project Page",url:"https://www.modestogov.com/3217/River-Trunk-Pump-Station-Project"},{label:"CEQAnet NOD — River Trunk Pipeline Permit (June 2025)",url:"https://ceqanet.lci.ca.gov/2016062033/6"}]},
+{id:2,name:"La Loma Sewer &amp; Water Rehabilitation — Multi-Phase Program",category:"Wastewater/Utilities",cc:"cww",budget:0,bd:"Multi-phase / TBD",funding:"City Enterprise Fund",status:"Active/Construction",score:5,
+ facts:["Phase 3A S&R at 96% complete per CIP tracker","Rebid Phase 2C S&R Water Mains at 85% complete","Rebid La Loma Sewer Phase 1 at 32% — mid-construction","Multiple contracts running simultaneously in La Loma neighborhood","Program covers sewer and water main replacement in aging residential area"],
+ inferences:["Successive phase structure means follow-on bid packages procured through 2027","Pipe rehab + water main = two contractor types, often bid as separate packages","Specialty trenchless/CIPP firms active in this program type","City utilities capacity thin — on-call engineering and inspection support likely active"],
+ sources:[{label:"City of Modesto — CIP Project Tracker",url:"https://www.modestogov.com/2591/Capital-Improvement-Program"}]},
+{id:3,name:"Jennings Plant Corrosion Control &amp; RWRF Improvements",category:"Wastewater/Utilities",cc:"cww",budget:0,bd:"TBD",funding:"City Enterprise Fund",status:"Active/Construction",score:5,
+ facts:["RWRF Jennings Corrosion Control Measures at 4% — just initiating per CIP tracker","City spent $130M+ on tertiary BNR/Membrane system at Jennings — complex specialty plant","Central Valley Regional Water Board considered revised WDRs for Sutter/Jennings at Dec 2025 meeting","New WDRs replace 1994 and 1999 orders regulating biosolids and irrigation discharge","Jennings treats ~15M gallons/day to tertiary recycled water standards"],
+ inferences:["Revised WDRs likely impose new nutrient limits or biosolids requirements — triggers capital upgrades","Corrosion control involves concrete rehab, chemical dosing systems, ventilation","Follow-on plant improvement contracts at Jennings probable within 1–2 years of new WDRs","Carollo, Brown & Caldwell, HDR are typical A/E firms for this class of work"],
+ sources:[{label:"State Water Board — Modesto WDRs Dec 2025 Board Item",url:"https://waterboards.ca.gov/centralvalley/board_decisions/tentative_orders/2512/11_modesto_wdrs/modesto_sum.pdf"},{label:"City CIP Tracker",url:"https://www.modestogov.com/2591/Capital-Improvement-Program"}]},
+{id:4,name:"Sonoma Trunk Extension Ph. 3 &amp; 4 + West Trunk + Woodland LS",category:"Wastewater/Utilities",cc:"cww",budget:0,bd:"TBD",funding:"City Enterprise Fund",status:"Active/Construction",score:4,
+ facts:["Sonoma Trunk Extension LS and Water Main at 91% — predecessor phase nearly done","Sonoma Sewer Trunk Extension Phases 3&4 at 0% — newly authorized","West Trunk Sewer Rehab at 16% — early stage construction","Woodland Lift Station Improvements at 0% — newly authorized","Bret Hart Neighborhood S&R Water Mains Phase 1 at 0% — newly authorized"],
+ inferences:["Multiple 0% projects = near-term construction procurement for specialty contractors","Lift station involves pump/electrical/SCADA — niche subcontractor scope","Bret Hart water main replacement follows La Loma model — successive phases likely","Trunk extension is growth-driven; additional phases expected as Modesto's west side builds out"],
+ sources:[{label:"City CIP Tracker",url:"https://www.modestogov.com/2591/Capital-Improvement-Program"}]},
+{id:5,name:"Sutter Plant Structural Improvements &amp; Security Upgrade",category:"Wastewater/Utilities",cc:"cww",budget:0,bd:"TBD",funding:"City Enterprise Fund",status:"Active/Construction",score:4,
+ facts:["Plant Structural Improvements at 98% complete — near final","RWRF Sutter Campus Parking Lot and Security Upgrade at 63% — mid-construction","Sutter processes ~20M gallons/day in industrial district","WDR changes may require headworks and solids handling upgrades at Sutter"],
+ inferences:["Near-term: wrap-up/punch list. Future opportunity is in follow-on capital from new WDRs","Parking/security program suggests ongoing facility improvement cycle","Structural improvements lessons learned will inform next phase of plant upgrades"],
+ sources:[{label:"City CIP Tracker",url:"https://www.modestogov.com/2591/Capital-Improvement-Program"}]},
+{id:6,name:"SR-99 / Briggsmore Ave–Carpenter Rd Interchange Improvement",category:"Transportation",cc:"ctr",budget:77000000,bd:"~$77M",funding:"TCEP (State) + StanCOG Measure L + Local",status:"Design/Procurement",score:5,
+ facts:["~$77M construction cost, primarily TCEP-funded; CTC must allocate by June 30, 2026","City of Modesto is lead agency; StanCOG coordinates Measure L funding share","R/W appraisals for all 67 parcels complete; 30 offers made as of fall 2025","Project adds separated bike/pedestrian active transportation elements","Public open house held October 2025 — in advanced design phase"],
+ inferences:["CTC allocation by June 2026 triggers fast-track construction procurement — IFB or RFP expected Q3 2026","R/W completion is on critical path — any holdouts could delay construction","Active transportation elements create subconsultant opportunities for landscape A/E","Urban interchange construction staging will be complex and traffic-intensive"],
+ sources:[{label:"StanCOG Measure L — Projects",url:"https://stanislausmeasurel.com/projects/"},{label:"City of Modesto — Briggsmore Community Meeting",url:"https://www.modestogov.com/CivicAlerts.aspx?AID=1582"},{label:"Measure L Oversight Committee Agenda (Sep 2025)",url:"https://www.stancog.org/AgendaCenter/ViewFile/ArchivedAgenda/_09022025-736"}]},
+{id:7,name:"Measure H Playground Renovations — 6 Parks",category:"Parks/Recreation",cc:"cpk",budget:10100000,bd:"$10.1M (6 parks)",funding:"Measure H",status:"Active/Construction",score:5,
+ facts:["Contracts awarded; Sutter Neighborhood Park and Brewer's Rose start spring 2026","Lakewood Park (1000 Eastridge Dr) already complete with treehouse theme, reopened 2025","Six total parks in this Measure H renovation program","Community voted on playground themes (April–May 2025 voting period)","Scope: sand removal, drainage sumps, ADA ramps, new equipment, wood chips"],
+ inferences:["6-park program is a bundled contract series — watch for follow-on cohorts","Inclusive play, ADA surfacing, shade structures are standard scope additions","Community voting model means more parks renovations follow annually","Measure H parks allocation is recurring — multi-year deferred maintenance backlog is ongoing opportunity"],
+ sources:[{label:"City — Sutter Neighborhood Park Playground Renovation",url:"https://www.modestogov.com/3187/Sutter-Neighborhood-Park-Playground-Reno"},{label:"Modesto Bee — Lakewood Park Reopening",url:"https://www.yahoo.com/news/renovations-modesto-park-playground-complete-203000976.html"}]},
+{id:8,name:"Measure H Streets — Curb, Gutter, Sidewalk Program",category:"Parks/Recreation",cc:"cpk",budget:0,bd:"$4.9M+ (annual)",funding:"Measure H",status:"Active/Construction",score:4,
+ facts:["Measure H Year 1 Public Works allocation: $4.9M including CGS Contractor Assistance Funding","Additional tree pruning crews and outside contractor tree services funded","Citywide facility condition assessment (excluding Utilities) funded — will drive follow-on repair contracts","Blight abatement and illegal dumping cleanup teams funded"],
+ inferences:["CGS program is a recurring annual contract — likely IFB format with multi-year options","Facility condition assessment triggers deferred maintenance capital RFPs for city buildings","Tree services contract is standalone recurring on-call — rebid periodically","Blight infrastructure (grading, fencing) creates small civil contract opportunities"],
+ sources:[{label:"City of Modesto — Measure H Allocation Plan",url:"https://www.modestogov.com/3031/What-is-Measure-H"}]},
+{id:9,name:"Fire Station 1 Rehabilitation",category:"Public Safety",cc:"cps",budget:850000,bd:"$850K",funding:"Federal FY 2026 Earmark (Rep. Adam Gray)",status:"Design/Procurement",score:4,
+ facts:["$850,000 federal community project funding secured by Rep. Adam Gray (FY 2026 appropriation)","Scope: rehabilitation and safety upgrades at downtown Fire Station No. 1","Specific needs include bay door improvements and firefighter readiness upgrades","Gray visited station alongside Fire Chief to assess needs in person","Modesto Fire provides regional service to Ceres, Turlock, Salida — contracts through June 2026"],
+ inferences:["Federal appropriation triggers competitive construction bid — likely late 2026","Deferred maintenance scope (ADA, HVAC, dormitory, restrooms) may be bundled in","Fire coverage study ($90K Measure H) will identify future new station sites","Station rehab is a relationship-building opportunity with Modesto Fire Dept. leadership"],
+ sources:[{label:"Rep. Gray — $16M Central Valley Funding (Feb 2026)",url:"https://gray.house.gov/media/press-releases/rep-gray-secures-over-16-million-district-funding"},{label:"Modesto Bee — Fire/Police Federal Funding",url:"https://www.aol.com/articles/central-valley-projects-16m-modesto-232916131.html"}]},
+{id:10,name:"Police Radio System Upgrade + RTCC/CAD Integration",category:"Public Safety",cc:"cps",budget:1031000,bd:"$1.03M (radio)",funding:"Federal FY 2026 Earmark + Measure H + General Fund",status:"Design/Procurement",score:4,
+ facts:["$1,031,000 federal earmark (Rep. Gray) for new mobile and portable radios, software, training","Replaces aging radio infrastructure citywide for Modesto Police","City deployed Real-Time Crime Center; integrating new CAD system in FY 2025-26","Red-light camera program planned for acquisition and launch in FY 2025-26","IT Department budget: $15.8M in FY 2025-26 — largest-ever tech investment for city"],
+ inferences:["Radio upgrade is technology procurement — integrator/vendor selection, not construction","RTCC + CAD integration = AV/IT specialty systems integrator scope","Red-light camera involves civil/electrical: conduit, mounts, controller cabinets at intersections","Police radio + CAD + RTCC = cluster of tech infrastructure projects through 2027"],
+ sources:[{label:"Rep. Gray press release",url:"https://gray.house.gov/media/press-releases/rep-gray-secures-over-16-million-district-funding"},{label:"GovTech — Modesto Budget Tech Opportunities",url:"https://insider.govtech.com/california/news/modesto-budget-plan-outlines-upcoming-tech-opportunities"}]},
+{id:11,name:"Grayson Well 69 &amp; Well 312 Treatment + Water Mains",category:"Water Supply",cc:"cwtr",budget:0,bd:"TBD",funding:"City Enterprise Fund (Water)",status:"Active/Construction",score:4,
+ facts:["Grayson Well 69 at 97% complete per CIP tracker","Well 312 Treatment and Flushline at 6% — just beginning construction","Empire Yosemite Blvd Water Main Crossings at 96% complete","City water service area includes Salida, Del Rio, Empire, Grayson, portions of Turlock","Active well development and treatment program serving expanding service area"],
+ inferences:["Well 312 treatment likely involves iron/manganese removal, disinfection, or nitrate — specialty scope","Active well program = recurring well development, pump/motor rehab, and treatment RFPs","Follow-on water main projects likely in Yosemite Blvd corridor as development continues","Water master plan (likely Carollo scope) will drive future well and distribution CIP"],
+ sources:[{label:"City CIP Tracker",url:"https://www.modestogov.com/2591/Capital-Improvement-Program"}]},
+{id:12,name:"7th Street Village — Downtown Mixed-Use (Under Construction)",category:"Housing/Downtown",cc:"chs",budget:68800000,bd:"$68.8M",funding:"LIHTC / Tax Credits / City / Multiple",status:"Active/Construction",score:3,
+ facts:["Groundbreaking February 26, 2026 — ~2-year construction timeline","79 low-income apartments + ground-floor commercial (leasing, community center, Head Start)","Located at 7th and J Streets, 1 block from Modesto Transit Center","City partnered with Visionary Home Builders of California (Stockton nonprofit)","First mixed-use development in downtown Modesto"],
+ inferences:["Catalytic project — ancillary city streetscape, utility relocation, sidewalk work expected around site","Transit Center proximity means pedestrian/ADA improvements likely via Measure H","Signals city active investment in downtown — future affordable housing projects may follow","Head Start in ground floor means elevated ADA, fire life safety, and programming requirements"],
+ sources:[{label:"Modesto Bee — 7th Street Village Groundbreaking (Feb 2026)",url:"https://www.aol.com/articles/four-stories-low-cost-apartments-220000762.html"},{label:"City of Modesto — Final Funding Announcement",url:"https://www.modestogov.com/CivicAlerts.aspx?AID=1568"}]},
+{id:13,name:"Fire Station Coverage Study &amp; Future New Station(s)",category:"Public Safety",cc:"cps",budget:90000,bd:"$90K (study) → $8–15M (construction)",funding:"Measure H",status:"Planning",score:2,
+ facts:["$90K Measure H funding for fire coverage optimization study — consultant to determine optimal station count, locations, ALS gaps","$350K also allocated for ALS equipment for engines/ladders","Modesto Fire serves Ceres, Turlock, Salida — regional contracts expire June 2026","Study will analyze response times, coverage areas, apparatus needs","New station construction has not been publicly scoped or sited yet"],
+ inferences:["Study output identifies new station site(s) — construction likely FY 2027–2028","A/E selection for fire station design could begin 2026 if study confirms immediate need","Fire station construction range: $8–$15M for typical single-story two-bay station","Apparatus fleet procurement follows regional contract renewal and coverage study"],
+ sources:[{label:"City of Modesto — Measure H Allocation Plan",url:"https://www.modestogov.com/3031/What-is-Measure-H"}]},
+{id:14,name:"North County Corridor Phase 2 — SR-132/SR-99 Interchange",category:"Transportation",cc:"ctr",budget:0,bd:"Est. $100M+ (TBD)",funding:"StanCOG Measure L + STIP + State/Federal",status:"Planning",score:3,
+ facts:["Phase 1 (Oakdale Rd to Claus Rd) broke ground Summer 2025, expected completion 2027","Phase 2: SR 132 West from Gates to Dakota and SR 99/SR 132 interchange","Phase 3 extends to Gates/Paradise Road with overcrossings, roundabout","StanCOG leads in partnership with Modesto, Riverbank, Oakdale, and Caltrans","SR 132 corridor has preserved ROW from the late 1950s — significant cost advantage"],
+ inferences:["Phase 1 completion in 2027 builds momentum for Phase 2 CTC programming","Expressway/interchange delivery creates A/E, structural, and heavy civil opportunities","Roundabout geometry makes design complex — Caltrans PS&E experience required","Specific phase packages will become active quickly once Phase 1 wraps"],
+ sources:[{label:"StanCOG Measure L — Projects",url:"https://stanislausmeasurel.com/projects/"},{label:"StanCOG Transportation Projects",url:"https://www.stancog.org/188/Transportation-Projects-Studies"}]}
+];
+
+let sc='score',sd='desc';
+
+function srt(col){
+  if(sc===col)sd=sd==='asc'?'desc':'asc';
+  else{sc=col;sd=(col==='score'||col==='budget')?'desc':'asc';}
+  ['score','name','category','budget','funding','status'].forEach(c=>{
+    const el=document.getElementById('si-'+c);
+    if(el){el.textContent=c===sc?(sd==='asc'?'▲':'▼'):'';el.className='si'+(c===sc?' active':'');}
+  });
+  render();
+}
+
+function getF(){
+  const s=document.getElementById('searchInput').value.toLowerCase();
+  const c=document.getElementById('catFilter').value;
+  const st=document.getElementById('statusFilter').value;
+  const sf=document.getElementById('scoreFilter').value;
+  return P.filter(p=>{
+    if(s&&!p.name.toLowerCase().includes(s)&&!p.category.toLowerCase().includes(s)&&!p.funding.toLowerCase().includes(s))return false;
+    if(c&&p.category!==c)return false;
+    if(st&&p.status!==st)return false;
+    if(sf&&p.score!==parseInt(sf))return false;
+    return true;
+  });
+}
+
+function render(){
+  const data=getF();
+  data.sort((a,b)=>{
+    let av=a[sc],bv=b[sc];
+    if(typeof av==='string')av=av.toLowerCase();
+    if(typeof bv==='string')bv=bv.toLowerCase();
+    if(av<bv)return sd==='asc'?-1:1;
+    if(av>bv)return sd==='asc'?1:-1;
+    return 0;
+  });
+  const tb=document.getElementById('tbody');
+  tb.innerHTML='';
+  document.getElementById('noResults').style.display=data.length?'none':'block';
+  document.getElementById('rowCount').textContent=data.length+' projects';
+  const sm={'Active/Construction':'sac','Design/Procurement':'sde','Planning':'spl','Future':'sfu'};
+  data.forEach(p=>{
+    const r=document.createElement('tr');
+    r.id='row-'+p.id;
+    r.innerHTML=`<td><span class="sb s${p.score}">${p.score}</span></td>
+      <td class="pn"><span class="ei" id="ei-${p.id}">+</span>${p.name}</td>
+      <td><span class="cp ${p.cc}">${p.category}</span></td>
+      <td class="bc">${p.bd}</td>
+      <td style="font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace">${p.funding}</td>
+      <td><span class="sp ${sm[p.status]||'sfu'}">${p.status}</span></td>`;
+    r.addEventListener('click',()=>tog(p.id));
+    tb.appendChild(r);
+    const dr=document.createElement('tr');
+    dr.className='dr';dr.id='d-'+p.id;
+    const fh=p.facts.map(f=>`<li><span class="b">&#9679;</span>${f}</li>`).join('');
+    const ih=p.inferences.map(f=>`<li class="inf"><span class="b">&#9670;</span>${f}</li>`).join('');
+    const sh=p.sources.map(s=>`<div><a href="${s.url}" target="_blank">&#8599; ${s.label}</a></div>`).join('');
+    dr.innerHTML=`<td class="dc" colspan="6"><div class="di">
+      <div class="ds"><h4><span class="tc">CONFIRMED</span> Facts</h4><ul>${fh}</ul></div>
+      <div class="ds"><h4><span class="ti">INFERRED</span> Inferences</h4><ul>${ih}</ul></div>
+      <div class="ds"><h4>Sources</h4><div class="sl">${sh}</div></div>
+    </div></td>`;
+    tb.appendChild(dr);
+  });
+}
+
+function tog(id){
+  const dr=document.getElementById('d-'+id);
+  const ei=document.getElementById('ei-'+id);
+  const mr=document.getElementById('row-'+id);
+  const open=dr.classList.contains('open');
+  dr.classList.toggle('open',!open);
+  mr.classList.toggle('exp',!open);
+  if(ei)ei.textContent=open?'+':'−';
+}
+
+function qf(t){
+  document.getElementById('searchInput').value='';
+  document.getElementById('catFilter').value='';
+  document.getElementById('statusFilter').value='';
+  document.getElementById('scoreFilter').value='';
+  document.querySelectorAll('.qfb').forEach(b=>b.classList.remove('active'));
+  if(t==='clear'){render();return;}
+  event.target.classList.add('active');
+  if(t==='active')document.getElementById('statusFilter').value='Active/Construction';
+  else if(t==='ww')document.getElementById('catFilter').value='Wastewater/Utilities';
+  else if(t==='trans')document.getElementById('catFilter').value='Transportation';
+  else if(t==='parks')document.getElementById('catFilter').value='Parks/Recreation';
+  else if(t==='top')document.getElementById('scoreFilter').value='4';
+  render();
+}
+
+function exportCSV(){
+  const data=getF();
+  const h=['Score','Project Name','Category','Est. Value','Funding','Status'];
+  const rows=data.map(p=>[p.score,`"${p.name.replace(/<[^>]+>/g,'').replace(/&[a-z]+;/g,' ')}"`,`"${p.category}"`,`"${p.bd}"`,`"${p.funding}"`,`"${p.status}"`]);
+  const csv=[h.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='modesto_cip_intelligence.csv';
+  a.click();
+}
+
+['searchInput','catFilter','statusFilter','scoreFilter'].forEach(id=>{
+  document.getElementById(id).addEventListener(id==='searchInput'?'input':'change',render);
+});
+render();
+</script>
+</body>
+</html>
